@@ -1,0 +1,17 @@
+syntax="proto3";
+
+package api;
+
+message CreateUserMessageInput {
+    string username=1;
+    string email=1;
+    string name=1;
+}
+
+message CreateUserMessageOutput {
+    string retmessage=1;
+}
+
+service CreateUserService {
+    rpc CreateUser(CreateUserMessageInput) returns (CreateUserMessageOutput) {}
+}
