@@ -1,0 +1,17 @@
+syntax = "proto3";
+package proto;
+
+
+message CreateUserInput {
+    string username=1;
+    string email=2;
+    string name=3;
+}
+
+message CreateUserOutput {
+    bool retmessage=1;
+}
+
+service MessengerService {
+    rpc CreateUser(CreateUserInput) returns (CreateUserOutput) {}
+}
