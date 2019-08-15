@@ -20,6 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
+	defer lis.Close()
 	grpcServer := grpc.NewServer()
 	proto.RegisterMessengerServiceServer(grpcServer, &handler.Server{})
 	reflection.Register(grpcServer)

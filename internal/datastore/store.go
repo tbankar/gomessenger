@@ -16,11 +16,12 @@ type LoginDetails struct {
 	LoginIPAddr string
 }
 
-type ChatMsgs struct {
-	UserID    UserID
-	Message   string
-	TimeStamp int64
-	Status    bool
+type Chat struct {
+	FromUserID UserID
+	Message    string
+	TimeStamp  int64
+	Status     bool
+	ToUserID   UserID
 }
 
 type UserServerMap struct {
