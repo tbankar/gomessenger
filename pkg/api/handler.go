@@ -10,9 +10,12 @@ import (
 type Server struct{}
 
 func (s *Server) CreateUser(ctx context.Context, in *proto.CreateUserInput) (*proto.CreateUserOutput, error) {
-	//c := datastore.UserDetails{"Tushar_Bankar1",Useremail: in.Email, Name: in.Name, UserID: "Tushar_Bankar1"}
-	c := datastore.UserDetails{"Tushar_Bankar1", in.Email, in.Username, in.Name}
-	output, err := datastore.SendCreateUser(c)
+	c := datastore.UserDetails{UserID: "Tushar_Bankar1", Useremail: in.Email, Username: in.Username, Name: in.Name}
+	var c1 datastore.DstoreOps = &c
+	output, err := c1.CreateUser()
+	if err != nil {
+		return nil, err
+	}
 	return &proto.CreateUserOutput{Retmessage: output}, nil
 
 }
