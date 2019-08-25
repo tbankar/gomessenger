@@ -2,9 +2,10 @@ package datastore
 
 import (
 	"context"
-	"errors"
+	"fmt"
 
 	"github.com/tsuna/gohbase"
+	"github.com/tsuna/gohbase/filter"
 	"github.com/tsuna/gohbase/hrpc"
 )
 
@@ -12,35 +13,54 @@ const (
 	FAMILYUSERS        = "user_details"
 	FAMILYACTUSERS     = "active_users"
 	FAMILYLOGINDETAILS = "login_details"
-	FAMILYMSGS         = "msgs"
-	FAMILYUIDMAP       = "user_to_server"
+	FAMILYMSGS         = "messages"
+	FAMILYUIDMAP       = "user_server_mapping"
 )
 
 func getConnHbase() gohbase.Client {
 	client := gohbase.NewClient("172.17.0.2")
 	return client
 }
+
 func isUserExists(uname string, cli gohbase.Client) (bool, error) {
-	family := map[string][]string{FAMILYUSERS: []string{"username"}}
-	req, err := hrpc.NewGetStr(context.Background(), "gomessenger", uname, hrpc.Families(family))
+	defer cli.Close()
+	f := filter.ByteArrayComparable{}
+	binComp := filter.NewBinaryComparator()
+	filter.NewSingleColumnValueFilter(FAMILYUSERS, "userid", filter.Equal, 2, false, true)
+	scanRequest, err := hrpc.NewScanStr(context.Background(), "gomessenger",
+		hrpc.Filters(pFilter))
+	scanRsp, err := cli.Scan(scanRequest)
+	return true, nil
+
+}
+
+func createUser(c *UserDetails) (bool, error) {
+	cli := getConnHbase()
+	defer cli.Close()
+	uID := string(c.UserID)
+	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"username": []byte(uID)}}
+	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", "row1", values)
 	if err != nil {
 		return false, err
 	}
-	resp, err := cli.Get(req)
+	rsp, err := cli.Put(putRequest)
 	if err != nil {
 		return false, err
 	}
-	if *resp.Exists {
-		return false, errors.New("User exists")
-	}
+	fmt.Println(rsp)
 	return true, nil
 
 }
 
 func (c *UserDetails) CreateUser() (bool, error) {
 	client := getConnHbase()
-	isUserExists(c.Username, client)
-	defer client.Close()
+	ok, err := isUserExists(c.Username, client)
+	if err != nil {
+		return false, err
+	}
+	if ok {
+		createUser(c)
+	}
 	if client == nil {
 		return false, nil
 	}

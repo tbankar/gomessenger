@@ -27,4 +27,5 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
+	return
 }
