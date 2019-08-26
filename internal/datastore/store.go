@@ -1,30 +1,28 @@
 package datastore
 
-type UserID string
-
 type UserDetails struct {
-	UserID    UserID
+	UserID    string
 	Useremail string
 	Username  string
 	Name      string
 }
 
 type LoginDetails struct {
-	UserID      UserID
+	UserID      string
 	LoginTS     int64
 	LogoutTS    int64
 	LoginIPAddr string
 }
 
 type Chat struct {
-	FromUserID UserID
+	FromUserID string
 	Message    string
 	TimeStamp  int64
 	Status     bool
-	ToUserID   UserID
+	ToUserID   string
 }
 
 type UserServerMap struct {
-	UserID   UserID
+	UserID   string
 	ServerIP string
 }
