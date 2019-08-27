@@ -17,10 +17,13 @@ func main() {
 	}
 	defer conn.Close()
 	client := proto.NewMessengerServiceClient(conn)
-	cuser, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: "tushar", Name: " Tushar Bankar", Email: "tabankar@gmail.com"})
+	cuserOut, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: "tushar", Name: " Tushar Bankar", Email: "tabankar@gmail.com"})
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(cuser)
-
+	if cuserOut.Retmessage != "" {
+		fmt.Println(cuserOut.Retmessage)
+	} else {
+		fmt.Println("User created")
+	}
 }

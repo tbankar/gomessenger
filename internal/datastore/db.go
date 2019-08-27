@@ -2,6 +2,8 @@ package datastore
 
 import (
 	"context"
+	"io"
+	"strconv"
 	"sync/atomic"
 
 	"github.com/google/uuid"
@@ -32,7 +34,6 @@ func getConnHbase() gohbase.Client {
 }
 
 func isUserExists(uname string, cli gohbase.Client) (bool, error) {
-	defer cli.Close()
 	b := filter.NewByteArrayComparable([]byte(uname))
 	comparator := filter.NewBinaryComparator(b)
 	bFilter := filter.NewSingleColumnValueFilter([]byte(FAMILYUSERS), []byte("username"), filter.Equal, comparator, false, true)
@@ -40,42 +41,44 @@ func isUserExists(uname string, cli gohbase.Client) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	scanResp, err := cli.Scan(scanReq).Next()
-	if err != nil {
-		return false, err
-	}
-	scanLen := len(scanResp.Cells)
-	if scanLen == 0 {
+	_, err = cli.Scan(scanReq).Next()
+	if err == io.EOF {
 		return true, nil
 	}
-	return false, nil
+	return false, err
+	/*scanLen := len(scanResp.Cells)
+	if scanLen == 0 {
+		return true, nil
+	}*/
 
 }
 
-func (c *UserDetails) CreateUser() (bool, error) {
+func (c *UserDetails) CreateUser() (string, bool, error) {
 	client := getConnHbase()
 	defer client.Close()
 
 	ok, err := isUserExists(c.Username, client)
 	if err != nil {
-		return false, err
+		return "", false, err
 	}
 	if ok {
-		rowCnt := atomic.AddInt64(globalCounter, 1)
+		rowCnt := strconv.FormatInt(atomic.AddInt64(globalCounter, 1), 10)
 		id := genUUID()
 		c.UserID = id.String()
 		values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"userid": []byte(c.UserID), "username": []byte(c.Username), "email": []byte(c.Useremail), "fullname": []byte(c.Name)}}
-		putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", string(rowCnt), values)
+		putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
 		if err != nil {
-			return false, err
+			return "", false, err
 		}
 		_, err = client.Put(putRequest)
 		if err != nil {
-			return false, err
+			return "", false, err
 		}
+	} else {
+		return "User exists", false, nil
 	}
 	if client == nil {
-		return false, nil
+		return "", false, nil
 	}
-	return true, nil
+	return "", true, nil
 }

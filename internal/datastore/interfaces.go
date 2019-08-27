@@ -1,7 +1,7 @@
 package datastore
 
 type DstoreOps interface {
-	CreateUser() (bool, error)
+	CreateUser() (string, bool, error)
 }
 
 func SendCreateUser(d DstoreOps) {

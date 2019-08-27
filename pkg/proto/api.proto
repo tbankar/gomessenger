@@ -9,7 +9,8 @@ message CreateUserInput {
 }
 
 message CreateUserOutput {
-    bool retmessage=1;
+    string retmessage=1;
+    bool res=2;
 }
 
 service MessengerService {
