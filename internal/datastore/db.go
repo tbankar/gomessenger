@@ -2,13 +2,11 @@ package datastore
 
 import (
 	"context"
-	"io"
+	"errors"
 	"strconv"
 	"sync/atomic"
 
 	"github.com/google/uuid"
-
-	"github.com/tsuna/gohbase/filter"
 
 	"github.com/tsuna/gohbase"
 	"github.com/tsuna/gohbase/hrpc"
@@ -33,52 +31,24 @@ func getConnHbase() gohbase.Client {
 	return client
 }
 
-func isUserExists(uname string, cli gohbase.Client) (bool, error) {
-	b := filter.NewByteArrayComparable([]byte(uname))
-	comparator := filter.NewBinaryComparator(b)
-	bFilter := filter.NewSingleColumnValueFilter([]byte(FAMILYUSERS), []byte("username"), filter.Equal, comparator, false, true)
-	scanReq, err := hrpc.NewScanStr(context.Background(), "gomessenger", hrpc.Filters(bFilter))
-	if err != nil {
-		return false, err
-	}
-	_, err = cli.Scan(scanReq).Next()
-	if err == io.EOF {
-		return true, nil
-	}
-	return false, err
-	/*scanLen := len(scanResp.Cells)
-	if scanLen == 0 {
-		return true, nil
-	}*/
-
-}
-
 func (c *UserDetails) CreateUser() (string, bool, error) {
 	client := getConnHbase()
+	if client == nil {
+		return "", false, errors.New("Error while connecting to HBase")
+	}
 	defer client.Close()
 
-	ok, err := isUserExists(c.Username, client)
+	rowCnt := strconv.FormatInt(atomic.AddInt64(globalCounter, 1), 10)
+	id := genUUID()
+	c.UserID = id.String()
+	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"userid": []byte(c.UserID), "username": []byte(c.Username), "email": []byte(c.Useremail), "fullname": []byte(c.Name)}}
+	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
 	if err != nil {
 		return "", false, err
 	}
-	if ok {
-		rowCnt := strconv.FormatInt(atomic.AddInt64(globalCounter, 1), 10)
-		id := genUUID()
-		c.UserID = id.String()
-		values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"userid": []byte(c.UserID), "username": []byte(c.Username), "email": []byte(c.Useremail), "fullname": []byte(c.Name)}}
-		putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
-		if err != nil {
-			return "", false, err
-		}
-		_, err = client.Put(putRequest)
-		if err != nil {
-			return "", false, err
-		}
-	} else {
-		return "User exists", false, nil
-	}
-	if client == nil {
-		return "", false, nil
+	_, err = client.Put(putRequest)
+	if err != nil {
+		return "", false, err
 	}
 	return "", true, nil
 }

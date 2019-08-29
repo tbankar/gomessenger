@@ -1,7 +1,10 @@
 package api
 
 import (
+	"log"
 	"net/http"
+
+	"github.com/gomessenger/apig/internal/datastore"
 
 	"github.com/gorilla/mux"
 )
@@ -23,6 +26,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		Fullname:  params["fullname"],
 	}
 
-	return
+	ok, err := datastore.IsUserExists(inp.Username)
+	if err != nil {
+		log.Fatalf("Error while checking existing user:%v", err)
+	}
+	if !ok {
+		w.Write([]byte("User already exists"))
+	} else {
+		//BL Here
+	}
 
 }
