@@ -33,3 +33,13 @@ func IsUserExists(uname string) (bool, error) {
 	}
 	return false, err
 }
+
+func MapUserToServer(username string) string {
+	if username[0] < 'i' {
+		return "useratoi"
+	} else if username[0] < 's' {
+		return "userjtos"
+	}
+	return "userttoz"
+
+}

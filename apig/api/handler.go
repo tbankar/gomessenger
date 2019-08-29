@@ -1,18 +1,18 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gomessenger/apig/internal/datastore"
-
 	"github.com/gorilla/mux"
 )
 
 type InputReq struct {
-	Username  string `json:"username"`
-	Fullname  string `json:"fullname`
-	UserEmail string `json:"email`
+	Username     string `json:"username"`
+	UserFullname string `json:"fullname`
+	UserEmail    string `json:"email`
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -21,9 +21,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	inp := InputReq{
-		Username:  params["username"],
-		UserEmail: params["email"],
-		Fullname:  params["fullname"],
+		Username:     params["username"],
+		UserEmail:    params["email"],
+		UserFullname: params["fullname"],
 	}
 
 	ok, err := datastore.IsUserExists(inp.Username)
@@ -33,7 +33,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		w.Write([]byte("User already exists"))
 	} else {
-		//BL Here
+		host := datastore.MapUserToServer(inp.Username)
+		msg, err := CallCreateUser(&inp, host)
+		if err != nil {
+			w.Write([]byte(fmt.Sprintf("%s", err)))
+		} else if msg != "" {
+			w.Write([]byte(fmt.Sprintf("%s", msg)))
+		} else {
+			w.WriteHeader(200)
+		}
 	}
-
 }
