@@ -27,7 +27,7 @@ func genUUID() uuid.UUID {
 }
 
 func getConnHbase() gohbase.Client {
-	client := gohbase.NewClient("172.17.0.2")
+	client := gohbase.NewClient("hbasedb")
 	return client
 }
 

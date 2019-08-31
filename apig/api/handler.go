@@ -1,40 +1,40 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"net/http"
 
-	"github.com/gomessenger/apig/internal/datastore"
-	"github.com/gorilla/mux"
+	"gomessenger/apig/internal/datastore"
 )
 
 type InputReq struct {
 	Username     string `json:"username"`
-	UserFullname string `json:"fullname`
-	UserEmail    string `json:"email`
+	UserFullname string `json:"fullname"`
+	UserEmail    string `json:"email"`
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
-	params := mux.Vars(r)
-	inp := InputReq{
-		Username:     params["username"],
-		UserEmail:    params["email"],
-		UserFullname: params["fullname"],
-	}
-
-	ok, err := datastore.IsUserExists(inp.Username)
+	var userDetails InputReq
+	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatalf("Error while checking existing user:%v", err)
+		fmt.Fprintf(w, "Please enter valid data")
+	}
+	json.Unmarshal(reqBody, &userDetails)
+
+	ok, err := datastore.IsUserExists(userDetails.Username)
+	if err != nil {
+		fmt.Fprintf(w, "Error while checking existing user:%v", err)
 	}
 	if !ok {
 		w.Write([]byte("User already exists"))
 	} else {
-		host := datastore.MapUserToServer(inp.Username)
-		msg, err := CallCreateUser(&inp, host)
+		host := datastore.MapUserToServer(userDetails.Username)
+		msg, err := CallCreateUser(&userDetails, host)
 		if err != nil {
 			w.Write([]byte(fmt.Sprintf("%s", err)))
 		} else if msg != "" {
@@ -43,4 +43,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
 		}
 	}
+}
+
+func SendMsg() (bool, error) {
+
 }

@@ -14,8 +14,7 @@ import (
 const FAMILYUSERS = "user_details"
 
 func IsUserExists(uname string) (bool, error) {
-	//Change IP address to hostname hbasedb
-	client := gohbase.NewClient("172.17.0.2")
+	client := gohbase.NewClient("hbasedb")
 	if client == nil {
 		return false, errors.New("Error while connecting to HBase")
 	}

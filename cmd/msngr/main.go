@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	handler "github.com/gomessenger/pkg/api"
-	"github.com/gomessenger/pkg/proto"
+	handler "gomessenger/pkg/api"
+	"gomessenger/pkg/proto"
 	"google.golang.org/grpc/reflection"
 
 	"google.golang.org/grpc"

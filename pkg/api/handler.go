@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 
-	"github.com/gomessenger/internal/datastore"
-	"github.com/gomessenger/pkg/proto"
+	"gomessenger/internal/datastore"
+	"gomessenger/pkg/proto"
 )
 
 type Server struct{}
