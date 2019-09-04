@@ -5,7 +5,19 @@ export class Register extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            fields:{},
+            errors:{}
+        }
+
+        this.register = this.register.bind(this)
     }
+    register(username) {
+        let fields = this.state.fields
+        console.log(fields["username"])
+
+    }
+
 
     render() {
         return ( 
@@ -18,7 +30,7 @@ export class Register extends React.Component {
                     <div className="form">
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
-                            <input type="text" name="username" placeholder="username"></input>
+                            <input type="text" name="username" value={this.state.fields.username} placeholder="username"></input>
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
@@ -35,7 +47,7 @@ export class Register extends React.Component {
                     </div>
                 </div>
                 <div className="footer">
-                    <button type="button" className="btn">
+                    <button type="button" className="btn" id="submit" onClick= {() => this.register()}>
                         Register
                     </button>
                 </div>
