@@ -6,16 +6,24 @@ export class Register extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            fields:{},
-            errors:{}
-        }
+                username:null,
+                email:null,
+                fullname:null,
+                password:null,
+        };
 
-        this.register = this.register.bind(this)
+        this.handleFormSubmit = this.handleFormSubmit.bind(this)
+
     }
-    register(username) {
-        let fields = this.state.fields
-        console.log(fields["username"])
+    handleChange = e => {
+        const {name,value} = e.target
+        this.setState({ [name]: value,[name]:value });
+    }
 
+    handleFormSubmit = e => {
+        e.preventDefault()
+        console.log(this.state.username)
+        console.log(this.state.password)
     }
 
 
@@ -27,10 +35,10 @@ export class Register extends React.Component {
                     <div className="image">
                         <img src={LogoImage} alt=""/>
                     </div>
-                    <div className="form">
+                    <div className="form" onSubmit={this.handleFormSubmit}>
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
-                            <input type="text" name="username" value={this.state.fields.username} placeholder="username"></input>
+                            <input type="text" name="username" placeholder="username" onChange={this.handleChange} ></input>
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
@@ -42,14 +50,12 @@ export class Register extends React.Component {
                         </div>
                         <div className="form-group">
                             <label htmlFor="name">Full Name</label>
-                            <input type="text" name="name" placeholder="name"></input>
+                            <input type="text" name="name" placeholder="full name"></input>
                         </div>
                     </div>
                 </div>
-                <div className="footer">
-                    <button type="button" className="btn" id="submit" onClick= {() => this.register()}>
-                        Register
-                    </button>
+                <div className="register">
+                    <button type="submit" className="btn" onClick={this.handleFormSubmit}>Register</button>
                 </div>
             </div> 
         );
