@@ -12,20 +12,38 @@ export class Register extends React.Component {
                 password:null,
         };
 
-        this.handleFormSubmit = this.handleFormSubmit.bind(this)
+        this.doSubmit = this.doSubmit.bind(this)
 
     }
-    handleChange = e => {
-        const {name,value} = e.target
-        this.setState({ [name]: value,[name]:value });
+
+    handleChange = (event) => {
+        const {name,value} = event.target
+        this.setState({[name]: value});
     }
 
-    handleFormSubmit = e => {
-        e.preventDefault()
-        console.log(this.state.username)
-        console.log(this.state.password)
-    }
+    doSubmit = (event) => {
+        event.preventDefault()
+        const data = {
+            Username: this.state.username,
+            Password: this.state.password,
+            Fullname: this.state.fullname,
+            Email: this.state.email,
+        };
+        return fetch("172.19.0.3", {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
 
+        }
+            )
+
+        
+    }
 
     render() {
         return ( 
@@ -35,27 +53,27 @@ export class Register extends React.Component {
                     <div className="image">
                         <img src={LogoImage} alt=""/>
                     </div>
-                    <div className="form" onSubmit={this.handleFormSubmit}>
+                    <div className="form" onSubmit={this.doSubmit}>
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
                             <input type="text" name="username" placeholder="username" onChange={this.handleChange} ></input>
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
-                            <input type="password" name="password" placeholder="password"></input>
+                            <input type="password" name="password" placeholder="password" onChange={this.handleChange} ></input>
                         </div>
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
-                            <input type="text" name="email" placeholder="email"></input>
+                            <input type="text" name="email" placeholder="email" onChange = {this.handleChange}></input>
                         </div>
                         <div className="form-group">
                             <label htmlFor="name">Full Name</label>
-                            <input type="text" name="name" placeholder="full name"></input>
+                            <input type="text" name="fullname" placeholder="full name" onChange={this.handleChange}></input>
                         </div>
                     </div>
                 </div>
                 <div className="register">
-                    <button type="submit" className="btn" onClick={this.handleFormSubmit}>Register</button>
+                    <button type="submit" className="btn" onClick={this.doSubmit}>Register</button>
                 </div>
             </div> 
         );
