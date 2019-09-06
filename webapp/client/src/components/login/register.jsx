@@ -10,6 +10,7 @@ export class Register extends React.Component {
                 email:null,
                 fullname:null,
                 password:null,
+                response : {regResp: []},
         };
 
         this.doSubmit = this.doSubmit.bind(this)
@@ -29,20 +30,18 @@ export class Register extends React.Component {
             Fullname: this.state.fullname,
             Email: this.state.email,
         };
-        return fetch("172.19.0.3", {
+        return fetch("http://127.0.0.1:8000/create", {
             method: 'POST',
-            mode: 'cors',
+            mode: 'no-cors',
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(data)
-        })
-        .then(response => {
-
-        }
-            )
-
-        
+        }).then(response => {
+            return response.json()
+        }).then(json => {
+            this.setState({response:json});
+        });
     }
 
     render() {
