@@ -16,19 +16,20 @@ func getConn(host string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func CallCreateUser(userinfo *InputReq, host string) (string, error) {
-	conn, err := getConn(host)
+func CallCreateUser(userinfo *InputReq, host string, uCreated chan bool, errChann chan error) {
+	// conn, err := getConn(host)
+
+	conn, err := getConn("localhost")
 	if err != nil {
-		return "", err
+		errChann <- err
 	}
 	defer conn.Close()
 	client := proto.NewMessengerServiceClient(conn)
-	cuserOut, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail})
+	created, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail})
+
 	if err != nil {
-		return "", err
-	} else if cuserOut.Retmessage != "" {
-		return cuserOut.Retmessage, nil
-	} else {
-		return "", nil
+		errChann <- err
+	} else if created.Res {
+		uCreated <- true
 	}
 }

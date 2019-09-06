@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/tsuna/gohbase/filter"
@@ -14,10 +15,12 @@ import (
 const FAMILYUSERS = "user_details"
 
 func IsUserExists(uname string) (bool, error) {
-	client := gohbase.NewClient("hbasedb")
+	// client := gohbase.NewClient("hbasedb")
+	client := gohbase.NewClient("172.17.0.2")
 	if client == nil {
 		return false, errors.New("Error while connecting to HBase")
 	}
+	fmt.Println("Connected")
 	defer client.Close()
 	b := filter.NewByteArrayComparable([]byte(uname))
 	comparator := filter.NewBinaryComparator(b)

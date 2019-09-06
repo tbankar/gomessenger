@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -27,14 +28,15 @@ func genUUID() uuid.UUID {
 }
 
 func getConnHbase() gohbase.Client {
-	client := gohbase.NewClient("hbasedb")
+	// client := gohbase.NewClient("hbasedb")
+	client := gohbase.NewClient("172.17.0.2")
 	return client
 }
 
-func (c *UserDetails) CreateUser() (string, bool, error) {
+func (c *UserDetails) CreateUser() (bool, error) {
 	client := getConnHbase()
 	if client == nil {
-		return "", false, errors.New("Error while connecting to HBase")
+		return false, errors.New("Error while connecting to HBase")
 	}
 	defer client.Close()
 
@@ -44,11 +46,12 @@ func (c *UserDetails) CreateUser() (string, bool, error) {
 	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"userid": []byte(c.UserID), "username": []byte(c.Username), "email": []byte(c.Useremail), "fullname": []byte(c.Name)}}
 	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
 	if err != nil {
-		return "", false, err
+		return false, err
 	}
 	_, err = client.Put(putRequest)
 	if err != nil {
-		return "", false, err
+		fmt.Println(err)
+		return false, err
 	}
-	return "", true, nil
+	return true, nil
 }

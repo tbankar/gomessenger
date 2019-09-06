@@ -22,6 +22,14 @@ export class Register extends React.Component {
         this.setState({[name]: value});
     }
 
+    handleResponseError(response) {
+        throw new Error("HTTP error, status = " + response.status);
+    }
+
+    handleError(error) {
+        console.log(error.message);
+    }
+
     doSubmit = (event) => {
         event.preventDefault()
         const data = {
@@ -36,12 +44,15 @@ export class Register extends React.Component {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         }).then(response => {
-            return response.json()
-        }).then(json => {
-            this.setState({response:json});
+            if (!response.ok) {
+                this.handleResponseError(response);
+            }
+        }).catch(error => {
+            this.handleError(error);
         });
+            
     }
 
     render() {

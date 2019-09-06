@@ -14,7 +14,7 @@ import (
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/create", api.CreateUser).Methods("POST")
-	// router.HandleFunc("/sendmsg", api.SendMsg).Methods("POST")
+	router.HandleFunc("/login", api.DoLogin).Methods("POST")
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
 	originsOk := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
