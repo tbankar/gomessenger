@@ -6,6 +6,7 @@ message CreateUserInput {
     string username=1;
     string email=2;
     string name=3;
+    string password=4;
 }
 
 message CreateUserOutput {

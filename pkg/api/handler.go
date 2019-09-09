@@ -10,7 +10,7 @@ import (
 type Server struct{}
 
 func (s *Server) CreateUser(ctx context.Context, in *proto.CreateUserInput) (*proto.CreateUserOutput, error) {
-	c := datastore.UserDetails{UserID: "Tushar_Bankar1", Useremail: in.Email, Username: in.Username, Name: in.Name}
+	c := datastore.UserDetails{UserID: in.Username, Useremail: in.Email, Username: in.Username, Name: in.Name, Password: in.Password}
 	var c1 datastore.DstoreOps = &c
 	ok, err := c1.CreateUser()
 	if err != nil {

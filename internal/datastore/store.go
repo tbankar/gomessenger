@@ -5,6 +5,7 @@ type UserDetails struct {
 	Useremail string
 	Username  string
 	Name      string
+	Password  string
 }
 
 type LoginDetails struct {

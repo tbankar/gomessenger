@@ -24,7 +24,7 @@ func CallCreateUser(userinfo *InputReq, host string, uCreated chan bool, errChan
 	}
 	defer conn.Close()
 	client := proto.NewMessengerServiceClient(conn)
-	created, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail})
+	created, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail, Password: userinfo.Password})
 
 	if err != nil {
 		errChann <- err

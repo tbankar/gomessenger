@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/tsuna/gohbase"
@@ -14,22 +15,33 @@ const FAMILYUSERS = "user_details"
 
 func IsUserExists(uname, password string) (bool, error) {
 	// client := gohbase.NewClient("hbasedb")
-	client := gohbase.NewClient("172.17.0.3")
+	client := gohbase.NewClient("172.17.0.2")
 
 	if client == nil {
 		return false, errors.New("Error while connecting to HBase")
 	}
 	defer client.Close()
 
-	b := filter.NewByteArrayComparable([]byte(uname))
-	b1 := filter.NewByteArrayComparable([]byte(password))
-	comparator := filter.NewBinaryComparator(b)
-	comparator1 := filter.NewBinaryComparator(b1)
-	bFilter := filter.NewSingleColumnValueFilter([]byte(FAMILYUSERS), []byte("username"), filter.Equal, comparator, false, true)
-	bFilter1 := filter.NewSingleColumnValueFilter([]byte(FAMILYUSERS), []byte("password"), filter.Equal, comparator1, false, true)
+	var err error
+	var bFilter1 filter.SingleColumnValueFilter
+	var scanReq *hrpc.Scan
+	if password != "" {
+		b1 := filter.NewByteArrayComparable([]byte(password))
+		comparator1 := filter.NewBinaryComparator(b1)
+		bFilter1 = *filter.NewSingleColumnValueFilter([]byte(FAMILYUSERS), []byte("password"), filter.Equal, comparator1, false, true)
+	}
 
-	scanReq, err := hrpc.NewScanStr(context.Background(), "gomessenger", hrpc.Filters(bFilter), hrpc.Filters(bFilter1))
+	b := filter.NewByteArrayComparable([]byte(uname))
+	comparator := filter.NewBinaryComparator(b)
+	bFilter := filter.NewSingleColumnValueFilter([]byte(FAMILYUSERS), []byte("username"), filter.Equal, comparator, false, true)
+	if password != "" {
+		scanReq, err = hrpc.NewScanStr(context.Background(), "gomessenger", hrpc.Filters(bFilter), hrpc.Filters(&bFilter1))
+	} else {
+		scanReq, err = hrpc.NewScanStr(context.Background(), "gomessenger", hrpc.Filters(bFilter))
+	}
+
 	if err != nil {
+		fmt.Println(err)
 		return false, err
 	}
 
