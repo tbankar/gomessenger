@@ -1,5 +1,7 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
+// import { Base64 } from 'js-base64';
+
 
 export class Register extends React.Component {
 
@@ -38,6 +40,7 @@ export class Register extends React.Component {
             Fullname: this.state.fullname,
             Email: this.state.email,
         };
+        // data.Password = Base64.encode(data.Password)
         return fetch("http://127.0.0.1:8000/create", {
             method: 'POST',
             mode: 'no-cors',

@@ -14,6 +14,14 @@ type InputReq struct {
 	Username     string `json:"username"`
 	UserFullname string `json:"fullname"`
 	UserEmail    string `json:"email"`
+	Password     string `json:"password"`
+}
+
+type ValidateUserInput struct {
+	Username     string
+	Password     string
+	Email        string
+	UserFullname string
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -30,11 +38,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	json.Unmarshal(reqBody, &userDetails)
 
-	ok, err := datastore.IsUserExists(userDetails.Username)
+	ok, err := datastore.IsUserExists(userDetails.Username, "username")
 	if err != nil {
 		fmt.Fprintf(w, "Error while checking existing user:%v", err)
 	}
-	if !ok {
+	if ok {
 		w.Write([]byte("User already exists"))
 	} else {
 		host := datastore.MapUserToServer(userDetails.Username)
@@ -59,11 +67,11 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	json.Unmarshal(reqBody, &userDetails)
 
-	ok, err := datastore.IsUserExists(userDetails.Username)
+	ok, err := datastore.IsUserExists(userDetails.Password, "password")
 	if err != nil {
 		fmt.Fprintf(w, "Error while checking existing user:%v", err)
 	}
-	if !ok {
+	if ok {
 		//Check password here
 	}
 

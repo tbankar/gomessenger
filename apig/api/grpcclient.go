@@ -17,9 +17,8 @@ func getConn(host string) (*grpc.ClientConn, error) {
 }
 
 func CallCreateUser(userinfo *InputReq, host string, uCreated chan bool, errChann chan error) {
-	// conn, err := getConn(host)
+	conn, err := getConn(host)
 
-	conn, err := getConn("localhost")
 	if err != nil {
 		errChann <- err
 	}

@@ -5,12 +5,16 @@ export class Login extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state ={
+            username:null,
+            password:null,
+        };
         this.doLogin = this.doLogin.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange = (event) => {
-        event.preventDefault()
         const {name,value} = event.target
         this.setState({[name]:value});
     }
@@ -25,6 +29,7 @@ export class Login extends React.Component {
 
     doLogin = (event) => {
         event.preventDefault()
+        console.log(this.password)
         const data = {
             Username: this.state.username,
             Password: this.state.password,
@@ -60,7 +65,7 @@ export class Login extends React.Component {
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
-                            <input type="password" name="password" placeholder="password"></input>
+                            <input type="password" name="password" placeholder="password" onChange={this.handleChange}></input>
                         </div>
                     </div>
                 </div>

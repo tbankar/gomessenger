@@ -16,9 +16,7 @@ class App extends React.Component {
 
     if (isLogginActive) {
       this.rightSide.classList.remove("right");
-      //this.rightSide.classList.add("left");
     } else {
-      //this.rightSide.classList.remove("left");
       this.rightSide.classList.add("right");
     }
     this.setState(prevState => ({ isLogginActive: !prevState.isLogginActive }));
