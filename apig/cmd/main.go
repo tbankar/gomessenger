@@ -3,23 +3,36 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"gomessenger/apig/api"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/create", api.CreateUser).Methods("POST")
 	router.HandleFunc("/login", api.DoLogin).Methods("POST")
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
-	originsOk := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
-	// start server listen
-	// with error handling
-	log.Fatal(http.ListenAndServe("0.0.0.0:8000", handlers.CORS(originsOk, headersOk, methodsOk)(router)))
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods: []string{
+			http.MethodGet, //http methods for your app
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodPatch,
+			http.MethodDelete,
+			http.MethodOptions,
+			http.MethodHead,
+		},
+		AllowedHeaders: []string{
+			"*",
+		},
+	})
+
+	handler := c.Handler(router)
+
+	log.Fatal(http.ListenAndServe("0.0.0.0:8000", handler))
 }

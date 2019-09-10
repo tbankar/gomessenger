@@ -1,6 +1,6 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 
 export class Login extends React.Component {
 
@@ -11,6 +11,7 @@ export class Login extends React.Component {
             username:null,
             password:null,
             loggedin:false,
+            unauth:false,
         };
         this.doLogin = this.doLogin.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -31,25 +32,26 @@ export class Login extends React.Component {
 
     doLogin = (event) => {
         event.preventDefault()
-        console.log(this.password)
         const data = {
             Username: this.state.username,
             Password: this.state.password,
         };
         return fetch("http://127.0.0.1:8000/login", {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
-        }).then(response => {
-            if (!response.ok) {
-                this.handleResponseError(response);
-            } else if (response.ok) {
-                this.setState({loggedin:true });
-            }
-        }).catch(error => {
+        }).then(response => response.json())
+          .then((jsonData) => {
+              if (jsonData.statuscode === 200) {
+                  this.setState({loggedin:true})
+              } else if(jsonData.statuscode === 401) {
+                   this.setState({unauth: true})
+              }
+          })
+        .catch(error => {
             this.handleError(error);
         });
     }
@@ -80,7 +82,13 @@ export class Login extends React.Component {
                     <button type="button" className ="btn" onClick={this.doLogin}> 
                         Login
                     </button>
+                    <Link to="/signup">Sign-Up</Link>
                 </div>
+                {this.state.unauth && (
+                    <div>
+                        <h3>Incorrect Username/Password</h3>
+                    </div>
+                )} 
             </div> 
         );
     }

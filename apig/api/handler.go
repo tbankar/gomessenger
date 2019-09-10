@@ -24,13 +24,15 @@ type InputReq struct {
 	UserFullname string
 }*/
 
+type LoginResponse struct {
+	Status     string `json:"status"`
+	StatusCode int    `json:"statuscode"`
+}
+
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	created := make(chan bool)
 	errChan := make(chan error)
 	defer close(created)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 
 	var userDetails InputReq
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -62,6 +64,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func DoLogin(w http.ResponseWriter, r *http.Request) {
 	var userDetails InputReq
+	var LResp LoginResponse
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Please enter valid data")
@@ -72,9 +75,16 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Error while checking existing user:%v", err)
 	}
-	if !ok {
-		w.WriteHeader(200)
+	if ok {
+		LResp = LoginResponse{
+			StatusCode: http.StatusUnauthorized,
+			Status:     "Failed",
+		}
 	} else {
-		w.WriteHeader(401)
+		LResp = LoginResponse{
+			StatusCode: http.StatusOK,
+			Status:     "Success",
+		}
 	}
+	json.NewEncoder(w).Encode(LResp)
 }

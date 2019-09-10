@@ -1,8 +1,9 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.scss';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Login, Register } from './components/login/index';
+import Messenger from './components/login/messenger';
 
 
 class App extends React.Component {
@@ -11,25 +12,14 @@ class App extends React.Component {
             <Router>
             <div className="MessengerApp">
                 <Switch>
-                    <Route exact path="/" component={Home} />
-                    <Route path="/login" component={Login} />
+                    <Route exact path="/" component={Login} />
                     <Route path="/signup" component={Register} />
+                    <Route path="/messenger" component={Messenger} />
                 </Switch>
             </div>
             </Router>
         );
     }
 }
-
-const Home = () => (
-    <div>
-        <h1>
-            Home
-        </h1>
-    </div>
-
-)
-
-
 
 export default App

@@ -1,5 +1,6 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
+import { Redirect } from 'react-router-dom';
 // import { Base64 } from 'js-base64';
 
 
@@ -12,10 +13,12 @@ export class Register extends React.Component {
                 email:null,
                 fullname:null,
                 password:null,
+                bLogin: false,
                 response : {regResp: []},
         };
 
         this.doSubmit = this.doSubmit.bind(this)
+        this.backLogin = this.backLogin.bind(this)
 
     }
 
@@ -30,6 +33,10 @@ export class Register extends React.Component {
 
     handleError(error) {
         console.log(error.message);
+    }
+
+    backLogin = (event) => {
+        this.setState({bLogin:true})
     }
 
     doSubmit = (event) => {
@@ -61,7 +68,7 @@ export class Register extends React.Component {
     render() {
         return ( 
             <div className="base-container" ref={this.props.containerRef}>
-                <div className="header">Register</div>
+                <div className="header">Gomessenger Register</div>
                 <div className="content">
                     <div className="image">
                         <img src={LogoImage} alt=""/>
@@ -86,7 +93,11 @@ export class Register extends React.Component {
                     </div>
                 </div>
                 <div className="register">
-                    <button type="submit" className="btn" onClick={this.doSubmit}>Register</button>
+                    <button type="submit" className="btn" onClick={this.backLogin}>Back to Login</button>&nbsp;
+                    {this.state.bLogin && (
+                        <Redirect to="/"></Redirect>
+                    )}
+                    <button type="submit" className="btn" onClick={this.doSubmit}>Register Me</button>
                 </div>
             </div> 
         );
