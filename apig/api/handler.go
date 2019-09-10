@@ -27,6 +27,7 @@ type InputReq struct {
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	created := make(chan bool)
 	errChan := make(chan error)
+	defer close(created)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")

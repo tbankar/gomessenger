@@ -1,5 +1,6 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
+import { Redirect } from 'react-router-dom'
 
 export class Login extends React.Component {
 
@@ -9,6 +10,7 @@ export class Login extends React.Component {
         this.state ={
             username:null,
             password:null,
+            loggedin:false,
         };
         this.doLogin = this.doLogin.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -44,6 +46,8 @@ export class Login extends React.Component {
         }).then(response => {
             if (!response.ok) {
                 this.handleResponseError(response);
+            } else if (response.ok) {
+                this.setState({loggedin:true });
             }
         }).catch(error => {
             this.handleError(error);
@@ -51,6 +55,9 @@ export class Login extends React.Component {
     }
 
     render() {
+        if (this.state.loggedin) {
+            return <Redirect to="/messenger"/>
+        }
         return (
             <div className="base-container" ref={this.props.containerRef}>
                 <div className="header">Gomessenger Login</div>
@@ -78,3 +85,5 @@ export class Login extends React.Component {
         );
     }
 }
+
+export default Login;
