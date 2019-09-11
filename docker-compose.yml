@@ -1,37 +1,33 @@
 version: "3"
 services:
       apigateway:
-              image: golang:1.10.4
-         build:
-            context: .
-            dockerfile: Dockerfile-gateway
+         image: golang:1.10.4
+         build: .
          ports:
             - "8000:8000"
          hostname: "apig"
-         container_name: gateway
-         #      msngrserver1:
-              #image: "golang:1.10.4"
-              #         build:
-              #            context: .
-              #            dockerfile: Dockerfile-server
-              #         hostname: "useratoi"
-              #         container_name: server1
-              #      msngrserver2:
-              #image: "golang:1.10.4"
-              #         build:
-              #            context: .
-              #            dockerfile: Dockerfile-server
-              #         hostname: "userjtos"
-              #         container_name: server2
-              #      msngrserver3:
-              #image: "golang:1.10.4"
-              #         build:
-              #            context: .
-              #            dockerfile: Dockerfile-server
-              #         hostname: "userttoz"
-              #         container_name: server3
-              #      db:
-              #         image: "harisekhon/hbase:latest"
-              #         hostname: "hbasedb"
+         volumes:
+            - ./apig:/go/src/gomessenger/apig
+         networks: 
+            - mynet
+         tty: true
+         command:
+            /go/src/gomessenger/apig/scripts/build.sh
+            /go/src/gomessenger/apig/cmd/apig
+      msngrserver1:
+         image: "golang:1.10.4"
+         hostname: msngrserve1
+         volumes:
+            - ./server:/go/src/gomessenger/server
+         networks: 
+            - mynet
+         tty: true
+      db:
+         image: "harisekhon/hbase:latest"
+         hostname: "hbasedb"
+         networks: 
+            - mynet
 
+networks:
+  mynet:
          

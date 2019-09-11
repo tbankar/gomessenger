@@ -5,18 +5,9 @@ LABEL version="1.0"
 ADD https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 /usr/bin/dep
 RUN chmod +x /usr/bin/dep
 
-RUN mkdir -p /go/src/gomessenger/apig
-RUN mkdir -p /go/src/gomessenger/pkg/proto
+RUN cd /opt/gomessenger/cmd && dep ensure -v
 
-
-ADD ./apig /go/src/gomessenger/apig
-ADD ./pkg/proto /go/src/gomessenger/pkg/proto
-COPY ./Gopkg.toml ./Gopkg.lock /go/src/gomessenger/
-
-WORKDIR /go/src/gomessenger/apig/cmd
-
-
-RUN dep ensure -v
+WORKDIR /opt/gomessenger/cmd
 
 # Build the service inside the container.
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o apig .

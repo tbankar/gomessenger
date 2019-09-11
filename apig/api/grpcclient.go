@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"gomessenger/pkg/proto"
+	"gomessenger/server/pkg/proto"
 
 	"google.golang.org/grpc"
 )
