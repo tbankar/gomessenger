@@ -30,31 +30,47 @@ export class Login extends React.Component {
         console.log(error.message);
     }
 
+    
+
     doLogin = (event) => {
         event.preventDefault()
-        const data = {
-            Username: this.state.username,
-            Password: this.state.password,
-        };
-        return fetch("http://127.0.0.1:8000/login", {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        }).then(response => response.json())
-          .then((jsonData) => {
-              if (jsonData.statuscode === 200) {
-                  this.setState({loggedin:true})
-              } else if(jsonData.statuscode === 401) {
-                   this.setState({unauth: true})
-              }
-          })
-        .catch(error => {
-            this.handleError(error);
-        });
-    }
+
+        const isFormValid = ({...rest}) => {
+            let isValid=true
+
+            Object.values(rest).forEach(element => {
+                element === null && (isValid=false);
+            });
+
+        return isValid;
+        }
+        if (isFormValid(this.state)) {
+            const data = {
+                Username: this.state.username,
+                Password: this.state.password,
+            };
+            return fetch("http://127.0.0.1:8000/login", {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            }).then(response => response.json())
+            .then((jsonData) => {
+                if (jsonData.statuscode === 200) {
+                    this.setState({loggedin:true})
+                } else if(jsonData.statuscode === 401) {
+                    this.setState({unauth: true})
+                }
+            })
+            .catch(error => {
+                this.handleError(error);
+            });
+        } else {
+            console.error("Empty Username/Password");
+        }
+}
 
     render() {
         if (this.state.loggedin) {
@@ -81,7 +97,7 @@ export class Login extends React.Component {
                 <div className="footer">
                     <button type="button" className ="btn" onClick={this.doLogin}> 
                         Login
-                    </button>
+                    </button> &nbsp;&nbsp;&nbsp;
                     <Link to="/signup">Sign-Up</Link>
                 </div>
                 {this.state.unauth && (
