@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"gomessenger/server/internal/datastore"
-	"gomessenger/server/pkg/proto"
+	"gomessenger/proto"
 )
 
 type Server struct{}

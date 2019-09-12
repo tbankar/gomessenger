@@ -5,28 +5,31 @@ services:
          build: .
          ports:
             - "8000:8000"
-         hostname: "apig"
+         hostname: "apigateway"
          volumes:
             - ./apig:/go/src/gomessenger/apig
+            - ./proto:/go/src/gomessenger/proto
+            - ./build:/go/src/gomessenger/.build/
          networks: 
             - mynet
+         command: /bin/bash -c "/go/src/gomessenger/.build/build.sh 1 && /go/src/gomessenger/apigw"
          tty: true
-         command:
-            /go/src/gomessenger/apig/scripts/build.sh
-            /go/src/gomessenger/apig/cmd/apig
-      msngrserver1:
+      msngrserver:
          image: "golang:1.10.4"
-         hostname: msngrserve1
+         hostname: "msngrserver"
          volumes:
             - ./server:/go/src/gomessenger/server
+            - ./proto:/go/src/gomessenger/proto
+            - ./build:/go/src/gomessenger/.build/
          networks: 
             - mynet
+         command: /bin/bash -c "/go/src/gomessenger/.build/build.sh 0 1 && /go/src/gomessenger/msngr"
          tty: true
       db:
          image: "harisekhon/hbase:latest"
          hostname: "hbasedb"
          networks: 
-            - mynet
+           - mynet
 
 networks:
   mynet:

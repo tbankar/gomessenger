@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"gomessenger/pkg/proto"
+	"gomessenger/proto"
 
 	"google.golang.org/grpc"
 )

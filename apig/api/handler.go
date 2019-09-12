@@ -48,9 +48,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		w.Write([]byte("User already exists"))
 	} else {
-		host := datastore.MapUserToServer(userDetails.Username)
-		host = "localhost"
-		go CallCreateUser(&userDetails, host, created, errChan)
+		go CallCreateUser(&userDetails, created, errChan)
 		select {
 		case <-created:
 			w.WriteHeader(201)

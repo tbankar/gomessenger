@@ -3,21 +3,21 @@ package api
 import (
 	"context"
 
-	"gomessenger/server/pkg/proto"
+	"gomessenger/proto"
 
 	"google.golang.org/grpc"
 )
 
-func getConn(host string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(host+":8443", grpc.WithInsecure())
+func getConn() (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial("msngrserver:8443", grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	return conn, nil
 }
 
-func CallCreateUser(userinfo *InputReq, host string, uCreated chan bool, errChann chan error) {
-	conn, err := getConn(host)
+func CallCreateUser(userinfo *InputReq, uCreated chan bool, errChann chan error) {
+	conn, err := getConn()
 
 	if err != nil {
 		errChann <- err

@@ -5,7 +5,7 @@ import (
 	"net"
 
 	handler "gomessenger/server/pkg/api"
-	"gomessenger/server/pkg/proto"
+	"gomessenger/proto"
 	"google.golang.org/grpc/reflection"
 
 	"google.golang.org/grpc"
