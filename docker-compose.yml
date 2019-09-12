@@ -28,6 +28,7 @@ services:
       db:
          image: "harisekhon/hbase:latest"
          hostname: "hbasedb"
+         command: /bin/bash -c "echo create \"gomessenger\", \"user_details\", \"active_users\", \"user_login_details\", \"messeges\", \"ucount\"|hbase shell"
          networks: 
            - mynet
 
