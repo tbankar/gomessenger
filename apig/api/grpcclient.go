@@ -1,10 +1,10 @@
 package api
 
 import (
-	"context"
+	"bytes"
+	"encoding/json"
 
-	"gomessenger/proto"
-
+	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 )
 
@@ -16,19 +16,53 @@ func getConn() (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func CallCreateUser(userinfo *InputReq, uCreated chan bool, errChann chan error) {
-	conn, err := getConn()
-
+func CallCreateUser(userinfo *CreateInputReq, uCreated chan bool, errChann chan error) {
+	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.2:5672/")
 	if err != nil {
 		errChann <- err
 	}
 	defer conn.Close()
-	client := proto.NewMessengerServiceClient(conn)
-	created, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail, Password: userinfo.Password})
-
+	ch, err := conn.Channel()
 	if err != nil {
 		errChann <- err
-	} else if created.Res {
-		uCreated <- true
 	}
+	defer ch.Close()
+	// TODO: Decide server queue depending on user request hardcoding as of now as there is only one server
+	q, err := ch.QueueDeclare(
+		"server1",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		errChann <- err
+	}
+	b := new(bytes.Buffer)
+	m := make(map[string]CreateInputReq)
+	m[CREATE] = *userinfo
+	json.NewEncoder(b).Encode(m)
+	err = ch.Publish(
+		"",
+		q.Name,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/json",
+			Body:        b.Bytes(),
+		},
+	)
+	if err != nil {
+		errChann <- err
+	}
+
+	/*	client := proto.NewMessengerServiceClient(conn)
+		created, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail, Password: userinfo.Password})
+
+		if err != nil {
+			errChann <- err
+		} else if created.Res {
+			uCreated <- true
+		}*/
 }

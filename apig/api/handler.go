@@ -10,31 +10,13 @@ import (
 	"gomessenger/apig/internal/datastore"
 )
 
-type InputReq struct {
-	Username     string `json:"username"`
-	UserFullname string `json:"fullname"`
-	UserEmail    string `json:"email"`
-	Password     string `json:"password"`
-}
-
-/*type ValidateUserInput struct {
-	Username     string
-	Password     string
-	Email        string
-	UserFullname string
-}*/
-
-type LoginResponse struct {
-	Status     string `json:"status"`
-	StatusCode int    `json:"statuscode"`
-}
-
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	created := make(chan bool)
 	errChan := make(chan error)
 	defer close(created)
+	defer close(errChan)
 
-	var userDetails InputReq
+	var userDetails CreateInputReq
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Please enter valid data")
@@ -61,8 +43,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func DoLogin(w http.ResponseWriter, r *http.Request) {
-	var userDetails InputReq
-	var LResp LoginResponse
+	var userDetails CreateInputReq
+	var LResp LoginResp
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Please enter valid data")
@@ -74,12 +56,12 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Error while checking existing user:%v", err)
 	}
 	if ok {
-		LResp = LoginResponse{
+		LResp = LoginResp{
 			StatusCode: http.StatusUnauthorized,
 			Status:     "Failed",
 		}
 	} else {
-		LResp = LoginResponse{
+		LResp = LoginResp{
 			StatusCode: http.StatusOK,
 			Status:     "Success",
 		}

@@ -19,7 +19,7 @@ func main() {
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		AllowedMethods: []string{
-			http.MethodGet, //http methods for your app
+			http.MethodGet,
 			http.MethodPost,
 			http.MethodPut,
 			http.MethodPatch,

@@ -1,17 +1,66 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"net"
 
-	handler "gomessenger/server/pkg/api"
-	"gomessenger/proto"
-	"google.golang.org/grpc/reflection"
-
-	"google.golang.org/grpc"
+	"github.com/streadway/amqp"
 )
 
 const (
+	SERVER = "server1"
+)
+
+func stopOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s:%s", msg, err)
+	}
+
+}
+
+func main() {
+	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.2:5672/")
+	if err != nil {
+		log.Fatalf("Error while connecting to RabbitMQ server", err)
+	}
+
+	defer conn.Close()
+	ch, err := conn.Channel()
+	stopOnError(err, "Failed to open channel")
+
+	q, err := ch.QueueDeclare(
+		SERVER, // name
+		false,  // durable
+		false,  // delete when unused
+		false,  // exclusive
+		false,  // no-wait
+		nil,    // arguments
+	)
+	stopOnError(err, "Failed to declare a queue")
+
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	stopOnError(err, "Failed to register a consumer")
+
+	waitForever := make(chan bool)
+	go func() {
+		for msg := range msgs {
+			fmt.Println(msg)
+		}
+	}()
+	fmt.Println("Waiting...")
+	<-waitForever
+
+}
+
+/*const (
 	GRPCPORT = ":8443"
 )
 
@@ -27,5 +76,4 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
-	return
-}
+	return*/
