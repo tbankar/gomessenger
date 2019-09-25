@@ -25,12 +25,17 @@ services:
             - mynet
          command: /bin/bash -c "/go/src/gomessenger/.build/build.sh 0 1 && /go/src/gomessenger/msngr"
          tty: true
-      db:
-         image: "harisekhon/hbase:latest"
-         hostname: "hbasedb"
-         command: /bin/bash -c "echo create \"gomessenger\", \"user_details\", \"active_users\", \"user_login_details\", \"messeges\", \"ucount\"|hbase shell"
+      mqserver:
+         image: rabbitmq:latest
+         hostname: "mqserver"
          networks: 
-           - mynet
+            - mynet
+      #db:
+      #   image: "harisekhon/hbase:latest"
+      #   hostname: "hbasedb"
+      #   command: /bin/bash -c "echo create \"gomessenger\", \"user_details\", \"active_users\", \"user_login_details\", \"messeges\", \"ucount\"|hbase shell"
+      #   networks: 
+      #     - mynet
 
 networks:
   mynet:

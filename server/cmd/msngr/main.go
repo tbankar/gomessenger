@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gomessenger/server/internal"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -19,7 +20,7 @@ func stopOnError(err error, msg string) {
 }
 
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.2:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.3:5672/")
 	if err != nil {
 		log.Fatalf("Error while connecting to RabbitMQ server", err)
 	}
@@ -52,7 +53,10 @@ func main() {
 	waitForever := make(chan bool)
 	go func() {
 		for msg := range msgs {
-			fmt.Println(msg)
+			switch msg.Headers["action"] {
+			case "create":
+				internal.CreateUser(msg.Body)
+			}
 		}
 	}()
 	fmt.Println("Waiting...")

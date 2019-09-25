@@ -41,8 +41,8 @@ func (c *UserDetails) CreateUser() (bool, error) {
 
 	rowCnt := strconv.FormatInt(atomic.AddInt64(globalCounter, 1), 10)
 	id := genUUID()
-	c.UserID = id.String()
-	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"userid": []byte(c.UserID), "username": []byte(c.Username), "email": []byte(c.Useremail), "fullname": []byte(c.Name), "password": []byte(c.Password)}}
+	c.ID = id.String()
+	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"ID": []byte(c.ID), "username": []byte(c.Username), "email": []byte(c.Email), "fullname": []byte(c.FullName), "password": []byte(c.Password)}}
 	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
 	if err != nil {
 		return false, err

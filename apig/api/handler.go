@@ -8,12 +8,26 @@ import (
 	"time"
 
 	"gomessenger/apig/internal/datastore"
+
+	"github.com/gorilla/sessions"
+)
+
+const (
+	LOGIN  = "login"
+	LOGOUT = "logout"
+	CREATE = "create"
+)
+
+var (
+	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+	key   = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	created := make(chan bool)
+	published := make(chan bool)
 	errChan := make(chan error)
-	defer close(created)
+	defer close(published)
 	defer close(errChan)
 
 	var userDetails CreateInputReq
@@ -25,19 +39,21 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	ok, err := datastore.IsUserExists(userDetails.Username, "")
 	if err != nil {
-		fmt.Fprintf(w, "Error while checking existing user:%v", err)
+		fmt.Fprintf(w, "%v", err)
 	}
 	if !ok {
 		w.Write([]byte("User already exists"))
 	} else {
-		go CallCreateUser(&userDetails, created, errChan)
+		go CallCreateUser(&userDetails, published, errChan)
 		select {
-		case <-created:
-			w.WriteHeader(201)
+		case <-published:
+			go listenToMQ(CREATE)
+			close(errChan)
+			close(published)
 		case <-errChan:
 			w.Write([]byte(fmt.Sprintf("%s", err)))
-		case <-time.After(3 * time.Second):
-			w.Write([]byte("No response received"))
+		case <-time.After(5 * time.Second):
+			w.Write([]byte("Time exceeded while creating a user...Exited"))
 		}
 	}
 }
@@ -45,12 +61,24 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 func DoLogin(w http.ResponseWriter, r *http.Request) {
 	var userDetails CreateInputReq
 	var LResp LoginResp
+	success := make(chan bool)
+	errChan := make(chan error)
+	defer close(success)
+	defer close(errChan)
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Please enter valid data")
 	}
 	json.Unmarshal(reqBody, &userDetails)
-
+	go datastore.IsUserExists(userDetails.Username, userDetails.Password, success, errChan)
+	select {
+	case <-success:
+		w.WriteHeader(200)
+	case <-errChan:
+		w.Write([]byte(fmt.Sprintf("%s", err)))
+	case <-time.After(5 * time.Second):
+		w.Write([]byte("Time exceeded while creating a user"))
+	}
 	ok, err := datastore.IsUserExists(userDetails.Username, userDetails.Password)
 	if err != nil {
 		fmt.Fprintf(w, "Error while checking existing user:%v", err)

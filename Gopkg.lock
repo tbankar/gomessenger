@@ -10,11 +10,10 @@
   revision = "a26611c4d92dc9181cdb5e8d67fb712700fcd4a3"
 
 [[projects]]
-  digest = "1:7ade0e7351787347d3dd3456abb365fd71ea75c19a859505e6a427064e1f9e42"
+  digest = "1:f5ce1529abc1204444ec73779f44f94e2fa8fcdb7aca3c355b0c95947e4005c6"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
-    "protoc-gen-go/descriptor",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
@@ -74,6 +73,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:3df46e572883257c46c470dc1796f9bc609d0d0d7339dd10358030649b9beb93"
+  name = "github.com/streadway/amqp"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "edfb9018d2714e4ec54dbaba37dbfef2bdadf0e4"
+
+[[projects]]
+  branch = "master"
   digest = "1:c2c257e0cccff6bc61e5f176e197756040fd5a02a17d8595787c9508be3ce564"
   name = "github.com/tsuna/gohbase"
   packages = [
@@ -89,10 +96,9 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0a340546d886c7be0205fbacee4561ba04b188007d339b8377f1609a351a9d3d"
+  digest = "1:72187a29e64824e997d1ee7391248da77ee4daef093fc0087b6cc683ab2982dc"
   name = "golang.org/x/net"
   packages = [
-    "context",
     "http/httpguts",
     "http2",
     "http2/hpack",
@@ -153,7 +159,7 @@
   revision = "1774047e7e5133fa3573a4e51b37a586b6b0360c"
 
 [[projects]]
-  digest = "1:d7c803dfed573e0ce575cb2f259ea77418523c7fb8fb0940129fe7e8034ba43c"
+  digest = "1:2e18183989c76d073e9088f1a56f8b1c46ca920b74b529a50c2d7e5877ff18ac"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -182,8 +188,6 @@
     "metadata",
     "naming",
     "peer",
-    "reflection",
-    "reflection/grpc_reflection_v1alpha",
     "resolver",
     "resolver/dns",
     "resolver/passthrough",
@@ -204,13 +208,12 @@
     "github.com/google/uuid",
     "github.com/gorilla/mux",
     "github.com/rs/cors",
-    "github.com/sirupsen/logrus",
+    "github.com/streadway/amqp",
     "github.com/tsuna/gohbase",
     "github.com/tsuna/gohbase/filter",
     "github.com/tsuna/gohbase/hrpc",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
-    "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status"
   ]
   solver-name = "gps-cdcl"

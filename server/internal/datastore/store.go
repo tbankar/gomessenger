@@ -1,11 +1,11 @@
 package datastore
 
 type UserDetails struct {
-	UserID    string
-	Useremail string
-	Username  string
-	Name      string
-	Password  string
+	ID       string
+	Email    string
+	Username string
+	FullName string
+	Password string
 }
 
 type LoginDetails struct {

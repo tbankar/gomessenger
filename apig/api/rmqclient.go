@@ -16,8 +16,8 @@ func getConn() (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func CallCreateUser(userinfo *CreateInputReq, uCreated chan bool, errChann chan error) {
-	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.2:5672/")
+func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan<- error) {
+	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.3:5672/")
 	if err != nil {
 		errChann <- err
 	}
@@ -30,7 +30,7 @@ func CallCreateUser(userinfo *CreateInputReq, uCreated chan bool, errChann chan 
 	// TODO: Decide server queue depending on user request hardcoding as of now as there is only one server
 	q, err := ch.QueueDeclare(
 		"server1",
-		true,
+		false,
 		false,
 		false,
 		false,
@@ -40,17 +40,17 @@ func CallCreateUser(userinfo *CreateInputReq, uCreated chan bool, errChann chan 
 		errChann <- err
 	}
 	b := new(bytes.Buffer)
-	m := make(map[string]CreateInputReq)
-	m[CREATE] = *userinfo
-	json.NewEncoder(b).Encode(m)
+	json.NewEncoder(b).Encode(userinfo)
+	h := amqp.Table{ACTION: CREATE}
 	err = ch.Publish(
 		"",
 		q.Name,
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/json",
+			ContentType: "text/plain",
 			Body:        b.Bytes(),
+			Headers:     h,
 		},
 	)
 	if err != nil {
