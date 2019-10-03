@@ -12,21 +12,17 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-const (
-	LOGIN  = "login"
-	LOGOUT = "logout"
-	CREATE = "create"
-)
-
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
 )
 
+// CreateUser will create a user in a system
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	published := make(chan bool)
 	errChan := make(chan error)
+	done := make(chan interface{})
 	defer close(published)
 	defer close(errChan)
 
@@ -47,17 +43,23 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		go CallCreateUser(&userDetails, published, errChan)
 		select {
 		case <-published:
-			go listenToMQ(CREATE)
 			close(errChan)
 			close(published)
 		case <-errChan:
 			w.Write([]byte(fmt.Sprintf("%s", err)))
+			return
 		case <-time.After(5 * time.Second):
 			w.Write([]byte("Time exceeded while creating a user...Exited"))
+			return
+		}
+		select {
+		case <-done:
+			w.WriteHeader(http.StatusOK)
 		}
 	}
 }
 
+//DoLogin function will allow user to login to the system
 func DoLogin(w http.ResponseWriter, r *http.Request) {
 	var userDetails CreateInputReq
 	var LResp LoginResp

@@ -5,6 +5,8 @@ const (
 	SEND      = "send"
 	LISTUSERS = "listusers"
 	ACTION    = "action"
+	LOGIN     = "login"
+	LOGOUT    = "logout"
 )
 
 type CreateInputReq struct {
