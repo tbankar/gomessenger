@@ -72,7 +72,7 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Please enter valid data")
 	}
 	json.Unmarshal(reqBody, &userDetails)
-	go datastore.IsUserExists(userDetails.Username, userDetails.Password, success, errChan)
+	go datastore.IsUserExists(userDetails.Username, userDetails.Password)
 	select {
 	case <-success:
 		w.WriteHeader(200)

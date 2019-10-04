@@ -8,10 +8,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const (
-	SERVER = "server1"
-)
-
 func stopOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s:%s", msg, err)
@@ -30,12 +26,12 @@ func main() {
 	stopOnError(err, "Failed to open channel")
 
 	q, err := ch.QueueDeclare(
-		SERVER, // name
-		false,  // durable
-		false,  // delete when unused
-		false,  // exclusive
-		false,  // no-wait
-		nil,    // arguments
+		"exec_server_rpc", // name
+		false,             // durable
+		false,             // delete when unused
+		false,             // exclusive
+		false,             // no-wait
+		nil,               // arguments
 	)
 	stopOnError(err, "Failed to declare a queue")
 
@@ -55,7 +51,24 @@ func main() {
 		for msg := range msgs {
 			switch msg.Headers["action"] {
 			case "create":
-				internal.CreateUser(msg.Body)
+				var resp string
+				err := internal.CreateUser(msg.Body)
+				if err != nil {
+					resp = err.Error()
+				} else {
+					resp = "1"
+				}
+				err = ch.Publish(
+					"",
+					msg.ReplyTo,
+					false,
+					false,
+					amqp.Publishing{
+						ContentType:   "text/plain",
+						CorrelationId: msg.CorrelationId,
+						Body:          []byte(resp),
+					},
+				)
 			}
 		}
 	}()

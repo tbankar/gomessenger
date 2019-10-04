@@ -1,9 +1,7 @@
 package datastore
 
 type DstoreOps interface {
-	CreateUser() (bool, error)
+	CreateUser() error
 }
 
-func SendCreateUser(d DstoreOps) {
-	d.CreateUser()
-}
+var dstoreOps DstoreOps

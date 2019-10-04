@@ -32,10 +32,10 @@ func getConnHbase() gohbase.Client {
 	return client
 }
 
-func (c *UserDetails) CreateUser() (bool, error) {
+func (c *UserDetails) CreateUser() error {
 	client := getConnHbase()
 	if client == nil {
-		return false, errors.New("Error while connecting to HBase")
+		return errors.New("Error while connecting to HBase")
 	}
 	defer client.Close()
 
@@ -45,12 +45,12 @@ func (c *UserDetails) CreateUser() (bool, error) {
 	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"ID": []byte(c.ID), "username": []byte(c.Username), "email": []byte(c.Email), "fullname": []byte(c.FullName), "password": []byte(c.Password)}}
 	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
 	if err != nil {
-		return false, err
+		return err
 	}
 	_, err = client.Put(putRequest)
 	if err != nil {
 		fmt.Println(err)
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }

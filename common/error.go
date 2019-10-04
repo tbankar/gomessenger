@@ -9,7 +9,7 @@ type ErrorMessage struct {
 	ExtraInfo  map[string]interface{}
 }
 
-func PopulateError(err error, msg string, st string, extra ...interface{}) ErrorMessage {
+func PopulateError(err error, msg string, margs ...interface{}) ErrorMessage {
 	return ErrorMessage{
 		LowLevel:   err,
 		Message:    msg,

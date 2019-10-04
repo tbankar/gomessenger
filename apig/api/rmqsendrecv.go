@@ -3,10 +3,21 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"math/rand"
 
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 )
+
+func create_corrID() string {
+	const bytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	b := make([]byte, 16)
+	for i := range b {
+		b[i] = bytes[rand.Intn(len(bytes))]
+	}
+	return string(b)
+}
 
 func getConn() (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial("msngrserver:8443", grpc.WithInsecure())
@@ -29,32 +40,57 @@ func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan
 	defer ch.Close()
 	// TODO: Decide server queue depending on user request hardcoding as of now as there is only one server
 	q, err := ch.QueueDeclare(
-		"server1",
+		"",
 		false,
 		false,
 		false,
-		false,
+		true,
 		nil,
 	)
 	if err != nil {
 		errChann <- err
 	}
+
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+
+	if err != nil {
+		errChann <- err
+	}
+
+	corrID := create_corrID()
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(userinfo)
 	h := amqp.Table{ACTION: CREATE}
 	err = ch.Publish(
 		"",
-		q.Name,
+		"exec_server_rpc",
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        b.Bytes(),
-			Headers:     h,
+			ContentType:   "text/plain",
+			Body:          b.Bytes(),
+			CorrelationId: corrID,
+			ReplyTo:       q.Name,
+			Headers:       h,
 		},
 	)
 	if err != nil {
 		errChann <- err
+	}
+
+	for m := range msgs {
+		if corrID == m.CorrelationId {
+			fmt.Println(string(m.Body))
+		}
 	}
 
 	/*	client := proto.NewMessengerServiceClient(conn)
@@ -65,4 +101,5 @@ func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan
 		} else if created.Res {
 			uCreated <- true
 		}*/
+	return
 }

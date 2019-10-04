@@ -5,12 +5,12 @@ import (
 	"gomessenger/server/internal/datastore"
 )
 
-func stopOnError(err error, errMsg string) {
-
-}
-func CreateUser(userinfo []byte) {
+func CreateUser(userinfo []byte) error {
 	cu := datastore.UserDetails{}
 	err := json.Unmarshal(userinfo, &cu)
-	stopOnError(err, "createUser: json unmarshal error")
-	datastore.SendCreateUser(&cu)
+	if err != nil {
+		return err
+	}
+	err = datastore.DstoreOps.CreateUser()
+	return err
 }
