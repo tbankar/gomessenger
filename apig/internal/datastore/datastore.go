@@ -15,8 +15,7 @@ import (
 const FAMILYUSERS = "user_details"
 
 func IsUserExists(uname, password string) (bool, error) {
-	// client := gohbase.NewClient("hbasedb")
-	client := gohbase.NewClient("172.17.0.2")
+	client := gohbase.NewClient("hbasedb")
 	//log.SetLevel(5)
 
 	if client == nil {

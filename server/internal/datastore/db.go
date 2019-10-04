@@ -32,7 +32,7 @@ func getConnHbase() gohbase.Client {
 	return client
 }
 
-func (c *UserDetails) CreateUser() error {
+func (c UserDetails) CreateUser() error {
 	client := getConnHbase()
 	if client == nil {
 		return errors.New("Error while connecting to HBase")

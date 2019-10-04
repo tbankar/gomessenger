@@ -67,9 +67,12 @@ func main() {
 						ContentType:   "text/plain",
 						CorrelationId: msg.CorrelationId,
 						Body:          []byte(resp),
-					},
-				)
+					})
 			}
+			if err != nil {
+				fmt.Println(err)
+			}
+			msg.Ack(false)
 		}
 	}()
 	fmt.Println("Waiting...")

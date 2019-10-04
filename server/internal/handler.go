@@ -11,6 +11,8 @@ func CreateUser(userinfo []byte) error {
 	if err != nil {
 		return err
 	}
-	err = datastore.DstoreOps.CreateUser()
+	var d datastore.DstoreOps
+	d = cu
+	err = d.CreateUser()
 	return err
 }
