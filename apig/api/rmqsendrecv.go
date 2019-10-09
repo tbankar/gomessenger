@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"math/rand"
 
 	"github.com/streadway/amqp"
@@ -27,20 +26,20 @@ func getConn() (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan<- error) {
+func CallCreateUser(userinfo *CreateInputReq, responseChann chan<- string) {
 	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.3:5672/")
 	if err != nil {
-		errChann <- err
+		responseChann <- err.Error()
 	}
 	defer conn.Close()
 	ch, err := conn.Channel()
 	if err != nil {
-		errChann <- err
+		responseChann <- err.Error()
 	}
 	defer ch.Close()
 	// TODO: Decide server queue depending on user request hardcoding as of now as there is only one server
 	q, err := ch.QueueDeclare(
-		"",
+		userinfo.Username+"_Reply",
 		false,
 		false,
 		false,
@@ -48,7 +47,7 @@ func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan
 		nil,
 	)
 	if err != nil {
-		errChann <- err
+		responseChann <- err.Error()
 	}
 
 	msgs, err := ch.Consume(
@@ -62,7 +61,7 @@ func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan
 	)
 
 	if err != nil {
-		errChann <- err
+		responseChann <- err.Error()
 	}
 
 	corrID := create_corrID()
@@ -84,22 +83,13 @@ func CallCreateUser(userinfo *CreateInputReq, published chan bool, errChann chan
 		},
 	)
 	if err != nil {
-		errChann <- err
+		responseChann <- err.Error()
 	}
 
 	for m := range msgs {
 		if corrID == m.CorrelationId {
-			fmt.Println(string(m.Body))
+			responseChann <- string(m.Body)
 		}
 	}
-
-	/*	client := proto.NewMessengerServiceClient(conn)
-		created, err := client.CreateUser(context.Background(), &proto.CreateUserInput{Username: userinfo.Username, Name: userinfo.UserFullname, Email: userinfo.UserEmail, Password: userinfo.Password})
-
-		if err != nil {
-			errChann <- err
-		} else if created.Res {
-			uCreated <- true
-		}*/
 	return
 }

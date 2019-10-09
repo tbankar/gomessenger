@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"gomessenger/common"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -20,16 +21,14 @@ var (
 
 // CreateUser will create a user in a system
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	published := make(chan bool)
-	errChan := make(chan error)
-	done := make(chan interface{})
-	defer close(published)
-	defer close(errChan)
+	respChan := make(chan string)
+	defer close(respChan)
 
 	var userDetails CreateInputReq
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(w, "Please enter valid data")
+		common.ResponseToClient(400, "Please enter valid data", w)
+		return
 	}
 	json.Unmarshal(reqBody, &userDetails)
 
@@ -38,23 +37,19 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%v", err)
 	}
 	if !ok {
-		w.Write([]byte("User already exists"))
+		common.ResponseToClient(400, "User already exists", w)
 	} else {
-		go CallCreateUser(&userDetails, published, errChan)
+		go CallCreateUser(&userDetails, respChan)
 		select {
-		case <-published:
-			close(errChan)
-			close(published)
-		case <-errChan:
-			w.Write([]byte(fmt.Sprintf("%s", err)))
-			return
+		case s := <-respChan:
+			if s == "1" {
+				common.ResponseToClient(201, "Success", w)
+			} else {
+				common.ResponseToClient(200, s, w)
+			}
 		case <-time.After(5 * time.Second):
-			w.Write([]byte("Time exceeded while creating a user...Exited"))
+			common.ResponseToClient(503, "Time exceeded while creating a user...Exited", w)
 			return
-		}
-		select {
-		case <-done:
-			w.WriteHeader(http.StatusOK)
 		}
 	}
 }

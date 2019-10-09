@@ -79,21 +79,3 @@ func main() {
 	<-waitForever
 
 }
-
-/*const (
-	GRPCPORT = ":8443"
-)
-
-func main() {
-	lis, err := net.Listen("tcp", GRPCPORT)
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
-	defer lis.Close()
-	grpcServer := grpc.NewServer()
-	proto.RegisterMessengerServiceServer(grpcServer, &handler.Server{})
-	reflection.Register(grpcServer)
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatal(err)
-	}
-	return*/

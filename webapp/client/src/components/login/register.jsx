@@ -1,6 +1,8 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
 import { Redirect } from 'react-router-dom';
+import request from 'superagent'
+
 // import { Base64 } from 'js-base64';
 
 
@@ -26,6 +28,7 @@ export class Register extends React.Component {
                 validUsername:false,
                 validFullname:false,
                 validPassword:false,
+                createUserResp:"",
         };
 
         this.doSubmit = this.doSubmit.bind(this)
@@ -91,6 +94,7 @@ export class Register extends React.Component {
     }
 
     handleError(error) {
+        console.log("HERE");
         console.log(error.message);
     }
 
@@ -100,28 +104,22 @@ export class Register extends React.Component {
 
     doSubmit = (event) => {
         event.preventDefault()
+        var NetworkInfo = require('react-native-network-info');
         const data = {
             Username: this.state.username,
             Password: this.state.password,
             Fullname: this.state.fullname,
             Email: this.state.email,
+            SourceIpAddr: NetworkInfo.getIPAddress,
         };
         // data.Password = Base64.encode(data.Password)
-        return fetch("http://127.0.0.1:8000/create", {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        }).then(response => {
-            if (!response.ok) {
-                this.handleResponseError(response);
-            }
-        }).catch(error => {
-            this.handleError(error);
-        });
-            
+        request
+            .post('http://127.0.0.1:8000/create')
+            .set('Content-Type', 'application/json')
+            .send(JSON.stringify(data))
+            .end(function(_err, res){
+                    this.setState({createUserResp:res.text})
+        });  
     }
 
     render() {
@@ -167,6 +165,14 @@ export class Register extends React.Component {
                         <Redirect to="/"></Redirect>
                     )}
                     <button disabled={this.state.submitDisabled} type="submit" className="btn" onClick={this.doSubmit}>Register Me</button>
+                </div>
+                <div className="createUserMsg">
+                    {this.state.createUserResp != "Success" && (
+                        <h3>{this.state.createUserResp}</h3>
+                    )}
+                    {this.state.createUserResp == "Success" && (
+                        <h3>Registration successful</h3>
+                    )}
                 </div>
             </div> 
         );

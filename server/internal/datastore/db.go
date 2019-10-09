@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
-	"sync/atomic"
+	"os"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -28,10 +28,12 @@ func genUUID() uuid.UUID {
 }
 
 func getConnHbase() gohbase.Client {
+	//We can always get "hbasedb" either from config or from ENV variable
 	client := gohbase.NewClient("hbasedb")
 	return client
 }
 
+// CreateUser function stores user related information in DB
 func (c UserDetails) CreateUser() error {
 	client := getConnHbase()
 	if client == nil {
@@ -39,11 +41,14 @@ func (c UserDetails) CreateUser() error {
 	}
 	defer client.Close()
 
-	rowCnt := strconv.FormatInt(atomic.AddInt64(globalCounter, 1), 10)
 	id := genUUID()
 	c.ID = id.String()
-	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"ID": []byte(c.ID), "username": []byte(c.Username), "email": []byte(c.Email), "fullname": []byte(c.FullName), "password": []byte(c.Password)}}
-	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", rowCnt, values)
+
+	//Can optimize following
+	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"ID": []byte(c.ID),
+		"username": []byte(c.Username), "email": []byte(c.Email), "fullname": []byte(c.FullName), "password": []byte(c.Password),
+		"sourceIPAddr": []byte(c.SourceIPAddr)}}
+	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", string(os.Getpid())+string(time.Now().Unix()), values)
 	if err != nil {
 		return err
 	}
