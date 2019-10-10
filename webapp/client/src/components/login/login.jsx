@@ -1,6 +1,7 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
 import { Redirect, Link } from 'react-router-dom'
+import axios from 'axios'
 
 export class Login extends React.Component {
 
@@ -12,6 +13,7 @@ export class Login extends React.Component {
             password:null,
             loggedin:false,
             unauth:false,
+            sourceipaddr:"",
         };
         this.doLogin = this.doLogin.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -45,9 +47,12 @@ export class Login extends React.Component {
         return isValid;
         }
         if (isFormValid(this.state)) {
+            axios.get("http://www.geoplugin.net/json.gp")
+            .then(response => this.setState({sourceipaddr:response}))
             const data = {
                 Username: this.state.username,
                 Password: this.state.password,
+                SourceIpAddr: this.state.sourceIPAddr,
             };
             return fetch("http://127.0.0.1:8000/login", {
                 method: 'POST',

@@ -3,7 +3,6 @@ package datastore
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 
 	//log "github.com/sirupsen/logrus"
@@ -42,17 +41,17 @@ func IsUserExists(uname, password string) (bool, error) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
 	_, err = client.Scan(scanReq).Next()
 	if err == io.EOF {
-		return true, nil
+		return false, nil
 	}
-	return false, err
+	return true, err
 }
 
+// Idea is to map perticular set of Users to speicific server
 func MapUserToServer(username string) string {
 	if username[0] < 'i' {
 		return "useratoi"

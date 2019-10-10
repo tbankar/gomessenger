@@ -27,7 +27,7 @@ func getConn() (*grpc.ClientConn, error) {
 }
 
 func CallCreateUser(userinfo *CreateInputReq, responseChann chan<- string) {
-	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.3:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@mqserver:5672/")
 	if err != nil {
 		responseChann <- err.Error()
 	}

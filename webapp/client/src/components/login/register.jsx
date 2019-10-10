@@ -1,7 +1,8 @@
 import React from 'react';
 import LogoImage from '../../login.svg';
 import { Redirect } from 'react-router-dom';
-import request from 'superagent'
+import request from 'superagent';
+import axios from 'axios'
 
 // import { Base64 } from 'js-base64';
 
@@ -94,7 +95,6 @@ export class Register extends React.Component {
     }
 
     handleError(error) {
-        console.log("HERE");
         console.log(error.message);
     }
 
@@ -104,13 +104,14 @@ export class Register extends React.Component {
 
     doSubmit = (event) => {
         event.preventDefault()
-        var NetworkInfo = require('react-native-network-info');
+        axios.get("http://www.geoplugin.net/json.gp")
+        .then(response => this.setState({SourceIpAddr:response}))
         const data = {
             Username: this.state.username,
             Password: this.state.password,
             Fullname: this.state.fullname,
             Email: this.state.email,
-            SourceIpAddr: NetworkInfo.getIPAddress,
+            SourceIpAddr: this.state.SourceIpAddr
         };
         // data.Password = Base64.encode(data.Password)
         request
@@ -167,10 +168,10 @@ export class Register extends React.Component {
                     <button disabled={this.state.submitDisabled} type="submit" className="btn" onClick={this.doSubmit}>Register Me</button>
                 </div>
                 <div className="createUserMsg">
-                    {this.state.createUserResp != "Success" && (
+                    {this.state.createUserResp !== "Success" && (
                         <h3>{this.state.createUserResp}</h3>
                     )}
-                    {this.state.createUserResp == "Success" && (
+                    {this.state.createUserResp === "Success" && (
                         <h3>Registration successful</h3>
                     )}
                 </div>

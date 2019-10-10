@@ -36,7 +36,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "%v", err)
 	}
-	if !ok {
+	if ok {
 		common.ResponseToClient(400, "User already exists", w)
 	} else {
 		go CallCreateUser(&userDetails, respChan)
@@ -56,40 +56,21 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 //DoLogin function will allow user to login to the system
 func DoLogin(w http.ResponseWriter, r *http.Request) {
-	var userDetails CreateInputReq
-	var LResp LoginResp
-	success := make(chan bool)
-	errChan := make(chan error)
-	defer close(success)
-	defer close(errChan)
+	var userLogin LoginInputReq
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Please enter valid data")
 	}
-	json.Unmarshal(reqBody, &userDetails)
-	go datastore.IsUserExists(userDetails.Username, userDetails.Password)
-	select {
-	case <-success:
-		w.WriteHeader(200)
-	case <-errChan:
-		w.Write([]byte(fmt.Sprintf("%s", err)))
-	case <-time.After(5 * time.Second):
-		w.Write([]byte("Time exceeded while creating a user"))
-	}
-	ok, err := datastore.IsUserExists(userDetails.Username, userDetails.Password)
+	json.Unmarshal(reqBody, &userLogin)
+	ok, err := datastore.IsUserExists(userLogin.Username, userLogin.Password)
 	if err != nil {
 		fmt.Fprintf(w, "Error while checking existing user:%v", err)
 	}
 	if ok {
-		LResp = LoginResp{
-			StatusCode: http.StatusUnauthorized,
-			Status:     "Failed",
-		}
+		common.ResponseToClient(200, "Success", w)
 	} else {
-		LResp = LoginResp{
-			StatusCode: http.StatusOK,
-			Status:     "Success",
-		}
+		common.ResponseToClient(401, "Username/Password incorrect", w)
 	}
-	json.NewEncoder(w).Encode(LResp)
+
+	//TODO: Store detailed login info in hbase
 }

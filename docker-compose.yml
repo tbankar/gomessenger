@@ -8,7 +8,6 @@ services:
          hostname: "apigateway"
          volumes:
             - ./apig:/go/src/gomessenger/apig
-            - ./proto:/go/src/gomessenger/proto
             - ./build:/go/src/gomessenger/.build/
          networks: 
             - mynet
@@ -19,7 +18,6 @@ services:
          hostname: "msngrserver"
          volumes:
             - ./server:/go/src/gomessenger/server
-            - ./proto:/go/src/gomessenger/proto
             - ./build:/go/src/gomessenger/.build/
          networks: 
             - mynet

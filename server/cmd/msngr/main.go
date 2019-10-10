@@ -16,9 +16,9 @@ func stopOnError(err error, msg string) {
 }
 
 func main() {
-	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.3:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@mqserver:5672/")
 	if err != nil {
-		log.Fatalf("Error while connecting to RabbitMQ server", err)
+		log.Fatal("Error while connecting to RabbitMQ server", err)
 	}
 
 	defer conn.Close()

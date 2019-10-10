@@ -22,6 +22,7 @@ type LoginResp struct {
 }
 
 type LoginInputReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	SourceIPAddr string `json:"sourceipaddress"`
 }

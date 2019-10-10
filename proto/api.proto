@@ -1,3 +1,5 @@
+//Currently this file is not in use
+
 syntax = "proto3";
 package proto;
 
