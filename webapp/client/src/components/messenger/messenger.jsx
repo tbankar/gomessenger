@@ -13,10 +13,10 @@ class Messenger extends React.Component {
       };
     }
 
-    componentDidUpdate() {
+    componentDidMount() {
       axios.get("http://127.0.0.1:8000/onlineusers")
         .then(response => {
-          return this.setState({ usersOnline: response });
+          return this.setState({ usersOnline: response.data });
         })
     }
    

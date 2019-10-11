@@ -78,5 +78,12 @@ func (l LoginDetails) LoginUser() error {
 		"login_status": []byte(loginstat), "source_ipaddr": []byte(l.SourceIPAddr)}}
 
 	err := putRequestToHbase(values)
+	if err != nil {
+		return err
+	}
+	if l.LoginStatus {
+		values = map[string]map[string][]byte{FAMILYACTUSERS: map[string][]byte{"username": []byte(l.UserName)}}
+		err = putRequestToHbase(values)
+	}
 	return err
 }

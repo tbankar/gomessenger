@@ -3,6 +3,7 @@ package datastore
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	//log "github.com/sirupsen/logrus"
@@ -11,7 +12,10 @@ import (
 	"github.com/tsuna/gohbase/hrpc"
 )
 
-const FAMILYUSERS = "user_details"
+const (
+	FAMILYUSERS    = "user_details"
+	FAMILYACTUSERS = "active_users"
+)
 
 func IsUserExists(uname, password string) (bool, error) {
 	client := gohbase.NewClient("hbasedb")
@@ -49,6 +53,35 @@ func IsUserExists(uname, password string) (bool, error) {
 		return false, nil
 	}
 	return true, err
+}
+
+func GetOnlineUserList() ([]string, error) {
+
+	var result []string
+	client := gohbase.NewClient("hbasedb")
+	//log.SetLevel(5)
+	defer client.Close()
+	if client == nil {
+		return nil, errors.New("Error while connecting to HBase")
+	}
+
+	family := hrpc.Families(map[string][]string{"active_users": []string{"username"}})
+	scanReq, err := hrpc.NewScanStr(context.Background(), "gomessenger", family)
+
+	if err != nil {
+		return nil, err
+	}
+	rsp := client.Scan(scanReq)
+	for {
+		res, err := rsp.Next()
+		if err == io.EOF {
+			break
+		}
+		fmt.Println("res:", res, err)
+		result = append(result, string(res.Cells[0].Value))
+	}
+	return result, nil
+
 }
 
 // Idea is to map perticular set of Users to speicific server

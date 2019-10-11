@@ -6,6 +6,7 @@ import (
 	"gomessenger/common"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"gomessenger/apig/internal/datastore"
@@ -81,6 +82,11 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 	//TODO: Store detailed login info in hbase
 }
 
-func GetOnlineUsers(w http.ResponseWriter, r http.Request) {
+func GetOnlineUsers(w http.ResponseWriter, r *http.Request) {
 
+	userList, err := datastore.GetOnlineUserList()
+	if err != nil {
+		common.ResponseToClient(500, err.Error(), w)
+	}
+	common.ResponseToClient(200, strings.Join(userList, ","), w)
 }
