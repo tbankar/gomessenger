@@ -14,6 +14,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/create", api.CreateUser).Methods("POST")
 	router.HandleFunc("/login", api.DoLogin).Methods("POST")
+	router.HandleFunc("/onlineusers", api.GetOnlineUsers).Methods("GET")
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

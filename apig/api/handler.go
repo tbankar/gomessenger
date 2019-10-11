@@ -57,6 +57,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 //DoLogin function will allow user to login to the system
 func DoLogin(w http.ResponseWriter, r *http.Request) {
 	var userLogin LoginInputReq
+	respChan := make(chan string)
+	defer close(respChan)
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Please enter valid data")
@@ -68,9 +71,16 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	if ok {
 		common.ResponseToClient(200, "Success", w)
+		userLogin.LoginStatus = true
 	} else {
 		common.ResponseToClient(401, "Username/Password incorrect", w)
+		userLogin.LoginStatus = false
 	}
+	go LogToDB(&userLogin)
 
 	//TODO: Store detailed login info in hbase
+}
+
+func GetOnlineUsers(w http.ResponseWriter, r http.Request) {
+
 }

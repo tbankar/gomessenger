@@ -9,6 +9,7 @@ type ErrorMessage struct {
 	ExtraInfo  map[string]interface{}
 }
 
+//TODO: We have to log this error somewhere in a file
 func PopulateError(err error, msg string, margs ...interface{}) ErrorMessage {
 	return ErrorMessage{
 		LowLevel:   err,

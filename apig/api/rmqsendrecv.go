@@ -3,13 +3,14 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"gomessenger/common"
 	"math/rand"
 
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 )
 
-func create_corrID() string {
+func createCorrID() string {
 	const bytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	b := make([]byte, 16)
 	for i := range b {
@@ -64,7 +65,7 @@ func CallCreateUser(userinfo *CreateInputReq, responseChann chan<- string) {
 		responseChann <- err.Error()
 	}
 
-	corrID := create_corrID()
+	corrID := createCorrID()
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(userinfo)
@@ -92,4 +93,42 @@ func CallCreateUser(userinfo *CreateInputReq, responseChann chan<- string) {
 		}
 	}
 	return
+}
+
+func LogToDB(userLogin *LoginInputReq) {
+	conn, err := amqp.Dial("amqp://guest:guest@mqserver:5672/")
+	if err != nil {
+		common.PopulateError(err, "Error while dialing a connection to MQServer")
+	}
+	defer conn.Close()
+	ch, err := conn.Channel()
+	defer ch.Close()
+	q, err := ch.QueueDeclare(
+		"exec_server_rpc", // name
+		false,             // durable
+		false,             // delete when unused
+		false,             // exclusive
+		false,             // no-wait
+		nil,               // arguments
+	)
+	if err != nil {
+		common.PopulateError(err, "Error while Decalring a queue")
+	}
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(userLogin)
+	h := amqp.Table{ACTION: LOGIN}
+	err = ch.Publish(
+		"",
+		q.Name,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        b.Bytes(),
+			Headers:     h,
+		},
+	)
+	return
+
 }

@@ -1,13 +1,23 @@
 import  React  from 'react'
 import {Launcher} from 'react-chat-window'
+import axios from 'axios'
+
 
 class Messenger extends React.Component {
  
     constructor() {
       super();
       this.state = {
-        messageList: []
+        messageList: [],
+        usersOnline:[]
       };
+    }
+
+    componentDidUpdate() {
+      axios.get("http://127.0.0.1:8000/onlineusers")
+        .then(response => {
+          return this.setState({ usersOnline: response });
+        })
     }
    
     _onMessageWasSent(message) {
@@ -32,7 +42,7 @@ class Messenger extends React.Component {
       return (<div>
         <Launcher
           agentProfile={{
-            teamName: 'react-chat-window',
+            teamName: this.state.usersOnline,
           }}
           onMessageWasSent={this._onMessageWasSent.bind(this)}
           messageList={this.state.messageList}

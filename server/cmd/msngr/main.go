@@ -68,9 +68,11 @@ func main() {
 						CorrelationId: msg.CorrelationId,
 						Body:          []byte(resp),
 					})
-			}
-			if err != nil {
-				fmt.Println(err)
+			case "login":
+				err := internal.LoginUser(msg.Body)
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 			msg.Ack(false)
 		}

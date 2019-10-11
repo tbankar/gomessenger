@@ -10,9 +10,9 @@ type UserDetails struct {
 }
 
 type LoginDetails struct {
-	UserID       string
-	LoginTS      int64
-	LogoutTS     int64
+	UserName     string
+	LoginStatus  bool
+	LogoutStatus bool
 	SourceIPAddr string
 }
 

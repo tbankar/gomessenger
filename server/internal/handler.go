@@ -11,8 +11,19 @@ func CreateUser(userinfo []byte) error {
 	if err != nil {
 		return err
 	}
-	var d datastore.DstoreOps
-	d = cu
+	d := datastore.GetDStoreOps()
 	err = d.CreateUser()
 	return err
+}
+
+func LoginUser(userinfo []byte) error {
+	lu := datastore.LoginDetails{}
+	err := json.Unmarshal(userinfo, &lu)
+	if err != nil {
+		return err
+	}
+	d := datastore.GetDStoreOps()
+	err = d.LoginUser()
+	return err
+
 }

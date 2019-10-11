@@ -3,7 +3,6 @@ package datastore
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -33,13 +32,23 @@ func getConnHbase() gohbase.Client {
 	return client
 }
 
-// CreateUser function stores user related information in DB
-func (c UserDetails) CreateUser() error {
+func putRequestToHbase(data map[string]map[string][]byte) error {
 	client := getConnHbase()
 	if client == nil {
 		return errors.New("Error while connecting to HBase")
 	}
 	defer client.Close()
+
+	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", string(os.Getpid())+string(time.Now().Unix()), data)
+	if err != nil {
+		return err
+	}
+	_, err = client.Put(putRequest)
+	return err
+}
+
+// CreateUser function stores user related information in DB
+func (c UserDetails) CreateUser() error {
 
 	id := genUUID()
 	c.ID = id.String()
@@ -48,14 +57,26 @@ func (c UserDetails) CreateUser() error {
 	values := map[string]map[string][]byte{FAMILYUSERS: map[string][]byte{"ID": []byte(c.ID),
 		"username": []byte(c.Username), "email": []byte(c.Email), "fullname": []byte(c.FullName), "password": []byte(c.Password),
 		"sourceIPAddr": []byte(c.SourceIPAddr)}}
-	putRequest, err := hrpc.NewPutStr(context.Background(), "gomessenger", string(os.Getpid())+string(time.Now().Unix()), values)
-	if err != nil {
-		return err
+	err := putRequestToHbase(values)
+	return err
+}
+
+func (l LoginDetails) LoginUser() error {
+	client := getConnHbase()
+	if client == nil {
+		return errors.New("Error while connecting to HBase")
 	}
-	_, err = client.Put(putRequest)
-	if err != nil {
-		fmt.Println(err)
-		return err
+	defer client.Close()
+	var loginstat string
+	if l.LoginStatus {
+		loginstat = "SUCCESS"
+	} else {
+		loginstat = "FAILED"
 	}
-	return nil
+
+	values := map[string]map[string][]byte{FAMILYLOGINDETAILS: map[string][]byte{"username": []byte(l.UserName),
+		"login_status": []byte(loginstat), "source_ipaddr": []byte(l.SourceIPAddr)}}
+
+	err := putRequestToHbase(values)
+	return err
 }

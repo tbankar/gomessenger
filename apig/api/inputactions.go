@@ -24,5 +24,7 @@ type LoginResp struct {
 type LoginInputReq struct {
 	Username     string `json:"username"`
 	Password     string `json:"password"`
+	LoginStatus  bool
+	LogoutStatus bool
 	SourceIPAddr string `json:"sourceipaddress"`
 }
