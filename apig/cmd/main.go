@@ -15,6 +15,7 @@ func main() {
 	router.HandleFunc("/create", api.CreateUser).Methods("POST")
 	router.HandleFunc("/login", api.DoLogin).Methods("POST")
 	router.HandleFunc("/onlineusers", api.GetOnlineUsers).Methods("GET")
+	router.HandleFunc("/sendmsg", api.SendMsg).Methods("POST")
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

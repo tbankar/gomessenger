@@ -90,3 +90,7 @@ func GetOnlineUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	common.ResponseToClient(200, strings.Join(userList, ","), w)
 }
+
+func SendMsg(w http.ResponseWriter, r *http.Request) {
+
+}
