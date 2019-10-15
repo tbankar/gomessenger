@@ -7,6 +7,6 @@ It uses:
 Cache options:Memcached/Redis (Not implemented yet)
 
 #TODOs:
-1. Unit test cases
+1. Add Unit test cases
 2. A bit more documentation
-3. 
+
