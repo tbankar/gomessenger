@@ -5,3 +5,8 @@ It uses:
 2. Golang as backend
 3. NoSQL(HBase) to store the data
 Cache options:Memcached/Redis (Not implemented yet)
+
+#TODOs:
+1. Unit test cases
+2. A bit more documentation
+3. 
