@@ -1,39 +1,16 @@
 version: "3"
 services:
-      apigateway:
-         image: golang:1.10.4
-         build: .
-         ports:
-            - "8000:8000"
-         hostname: "apigateway"
-         volumes:
-            - ./apig:/go/src/gomessenger/apig
-            - ./build:/go/src/gomessenger/.build/
-         networks: 
-            - mynet
-         command: /bin/bash -c "/go/src/gomessenger/.build/build.sh 1 && /go/src/gomessenger/apigw"
-         tty: true
-      msngrserver:
-         image: "golang:1.10.4"
-         hostname: "msngrserver"
-         volumes:
-            - ./server:/go/src/gomessenger/server
-            - ./build:/go/src/gomessenger/.build/
-         networks: 
-            - mynet
-         command: /bin/bash -c "/go/src/gomessenger/.build/build.sh 0 1 && /go/src/gomessenger/msngr"
-         tty: true
       mqserver:
          image: rabbitmq:latest
          hostname: "mqserver"
          networks: 
             - mynet
-      #db:
-      #   image: "harisekhon/hbase:latest"
-      #   hostname: "hbasedb"
-      #   command: /bin/bash -c "echo create \"gomessenger\", \"user_details\", \"active_users\", \"user_login_details\", \"messeges\", \"ucount\"|hbase shell"
-      #   networks: 
-      #     - mynet
+      db:
+         image: "harisekhon/hbase:latest"
+         hostname: "hbasedb"
+         command: bash -c "echo create \"gomessenger\", \"user_details\", \"active_users\", \"user_login_details\", \"messeges\", \"ucount\"|hbase shell"
+         networks: 
+           - mynet
 
 networks:
   mynet:

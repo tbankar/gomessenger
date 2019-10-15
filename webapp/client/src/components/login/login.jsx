@@ -79,7 +79,10 @@ export class Login extends React.Component {
 
     render() {
         if (this.state.loggedin) {
-            return <Redirect to="/messenger"/>
+            return(
+                <Messenger usernamePass={this.state.username}>Loading...</Messenger>
+                <Redirect to="/messenger"/>
+            );
         }
         return (
             <div className="base-container" ref={this.props.containerRef}>

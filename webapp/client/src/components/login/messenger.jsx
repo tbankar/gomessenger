@@ -6,10 +6,11 @@ import axios from 'axios'
 class Messenger extends React.Component {
  
     constructor() {
-      super();
+      super(this.props);
       this.state = {
         messageList: [],
-        usersOnline:[]
+        usersOnline:[],
+        username:this.props.usernamePass,
       };
     }
 
@@ -35,7 +36,10 @@ class Messenger extends React.Component {
             data: { text }
           }]
         })
-        axios.post("")
+        axios.post("http://127.0.0.1:8000/sendmsg")
+        .then(response => {
+          console.log("Sent")
+        })
       }
     }
    

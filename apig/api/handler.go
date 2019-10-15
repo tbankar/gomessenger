@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	key   = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
 )
@@ -82,6 +81,7 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 	//TODO: Store detailed login info in hbase
 }
 
+//Get the list of online users
 func GetOnlineUsers(w http.ResponseWriter, r *http.Request) {
 
 	userList, err := datastore.GetOnlineUserList()
@@ -91,6 +91,7 @@ func GetOnlineUsers(w http.ResponseWriter, r *http.Request) {
 	common.ResponseToClient(200, strings.Join(userList, ","), w)
 }
 
+//TODO: Send messege to other user
 func SendMsg(w http.ResponseWriter, r *http.Request) {
 
 }
