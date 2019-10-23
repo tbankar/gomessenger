@@ -23,6 +23,9 @@ services:
             - net
          command: /bin/bash -c "/go/src/gomessenger/.build/build.sh 0 1 && /go/src/gomessenger/msngr"
          tty: true
+         depends_on: 
+            - apigateway
+            - mqserver
       mqserver:
          image: rabbitmq:latest
          hostname: "mqserver"

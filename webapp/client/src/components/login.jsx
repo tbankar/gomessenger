@@ -1,5 +1,5 @@
 import React from 'react';
-import LogoImage from '../../login.svg';
+import LogoImage from '../login.svg';
 import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
 
@@ -75,15 +75,9 @@ export class Login extends React.Component {
         } else {
             console.error("Empty Username/Password");
         }
-}
+    }
 
     render() {
-        if (this.state.loggedin) {
-            return(
-                <Messenger usernamePass={this.state.username}>Loading...</Messenger>
-                <Redirect to="/messenger"/>
-            );
-        }
         return (
             <div className="base-container" ref={this.props.containerRef}>
                 <div className="header">Gomessenger Login</div>
@@ -113,7 +107,10 @@ export class Login extends React.Component {
                         <h3>Incorrect Username/Password</h3>
                     </div>
                 )} 
-            </div> 
+                {this.state.loggedin && (
+                    this.props.history.push('/messenger',this.state.username)
+                )}
+            </div>
         );
     }
 }

@@ -55,6 +55,10 @@ func IsUserExists(uname, password string) (bool, error) {
 	return true, err
 }
 
+//GetOnlineUserList: This will return all online users
+//TODO: Implement Connection Pool
+//      Can use Read locks
+//      In DB, can set a flag On/OFF depending on user login status
 func GetOnlineUserList() ([]string, error) {
 
 	var result []string

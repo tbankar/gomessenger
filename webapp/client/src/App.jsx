@@ -2,8 +2,8 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.scss';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Login, Register } from './components/login/index';
-import Messenger from './components/messenger/messenger';
+import { Login, Register } from './components/index';
+import Messenger from './components/messenger';
 
 
 class App extends React.Component {

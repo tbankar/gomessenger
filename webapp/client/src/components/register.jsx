@@ -1,5 +1,5 @@
 import React from 'react';
-import LogoImage from '../../login.svg';
+import LogoImage from '../login.svg';
 import { Redirect } from 'react-router-dom';
 import request from 'superagent';
 import axios from 'axios'
