@@ -10,4 +10,4 @@ Cache options:Memcached/Redis (Not implemented yet)
 1. Add Unit test cases
 2. A bit more documentation
 
-![Screenshot](gomessenger architecture.jpg)
+![Screenshot](gomessenger_arch.jpg)
