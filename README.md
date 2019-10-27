@@ -4,7 +4,7 @@ It uses:
 1. ReactJS as frontend
 2. Golang as backend
 3. NoSQL(HBase) to store the data
-Cache options:Memcached/Redis (Not implemented yet)
+To upload/Download files, it will use peer to peer connection with notification to a Server
 
 #TODOs:
 1. Add Unit test cases
