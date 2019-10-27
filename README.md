@@ -5,7 +5,7 @@ It uses:
 2. Golang as backend
 3. NoSQL(HBase) to store the data
 
-To upload/Download files, it will use peer to peer connection with notification to a Server
+To Upload/Download files, it will use peer to peer connection with client and a notification to a Server
 
 #TODOs:
 1. Add Unit test cases
