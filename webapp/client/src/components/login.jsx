@@ -2,6 +2,7 @@ import React from 'react';
 import LogoImage from '../login.svg';
 import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
+import Messenger from './messenger';
 
 export class Login extends React.Component {
 
@@ -108,7 +109,8 @@ export class Login extends React.Component {
                     </div>
                 )} 
                 {this.state.loggedin && (
-                    this.props.history.push('/messenger',this.state.username)
+                    <Messenger username={this.state.username}></Messenger>
+                    // this.props.history.push('/messenger',this.state.username)
                 )}
             </div>
         );

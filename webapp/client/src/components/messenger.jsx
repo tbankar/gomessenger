@@ -10,7 +10,7 @@ class Messenger extends React.Component {
       this.state = {
         messageList: [],
         usersOnline:[],
-        username:this.props.usernamePass,
+        username:this.props.username,
       };
     }
 
